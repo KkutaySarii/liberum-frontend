@@ -19,3 +19,10 @@ body {
   background: var(--background);
   font-family: 'Satoshi-Regular', sans-serif;
 }
+body::-webkit-scrollbar {
+  display: none;  
+}
+.noscrollbar::-webkit-scrollbar {
+  display: none;
+}
+
