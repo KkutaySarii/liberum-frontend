@@ -18,6 +18,7 @@ interface MetaMaskError extends Error {
 
 export const useMetaMask = () => {
   const [isConnecting, setIsConnecting] = useState(false)
+  const [isOpen, setIsOpen] = useState(false) 
   const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
@@ -61,5 +62,10 @@ export const useMetaMask = () => {
     }
   }
 
-  return { connect, isConnecting }
+  const disconnect = () => {
+    dispatch(setAccount(''))
+    setIsOpen(false)
+  }
+
+  return { connect, disconnect, isConnecting, isOpen, setIsOpen }
 } 

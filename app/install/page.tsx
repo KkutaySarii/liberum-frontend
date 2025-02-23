@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Vector from "@/assets/Vectorr.svg";
 import Vector2 from "@/assets/Vector2.svg";
 import GoogleIcon from "@/assets/Google Chrome.svg";
-import ExtensionIcon from "@/assets/Extension.svg";
+import ExtensionIcon from "@/assets/Extension (1).svg";
 import NavbarInstall from '@/components/NavbarInstall';
 
 const InstallPage = () => {
@@ -21,7 +21,7 @@ const InstallPage = () => {
         Explore .lib domains—your gateway to the decentralized web.
       </p>
 
-      <div className="relative w-full max-w-3xl mx-auto flex justify-center items-center mb-16">
+      <div className="relative w-full max-w-3xl mx-auto flex justify-center items-center z-0 ">
         <Image 
           src={Vector}
           alt="Left Arrow"
@@ -35,7 +35,7 @@ const InstallPage = () => {
           alt="Extension"
           width={181}
           height={235}
-          className="w-full justify-center items-center"
+          className="w-full justify-center items-center z-20 overflow-hidden "
         />
         </div>
         <Image 
@@ -46,7 +46,7 @@ const InstallPage = () => {
           className="absolute right-0 translate-x-1/2"
         />
       </div>
-      <div className='absolute bottom-[88px] max-w-4xl mx-auto bg-[#141414] w-full h-[100px] rounded-2xl flex justify-center items-center'> 
+      <div className='max-w-4xl mx-auto bg-[#141414] w-full h-[100px] rounded-2xl flex justify-center items-center'> 
 
       <Link 
         href="https://chrome.google.com/webstore"
@@ -62,20 +62,20 @@ const InstallPage = () => {
       </Link>
       </div>
 
-      <div className="max-w-2xl mx-auto mt-28 font-satoshi-light font-thin text-stroke-thin text-base mb-6 leading-relaxed tracking-wider text-center">
-        <p className="text-base">
+      <div className="max-w-2xl mx-auto mt-6 font-satoshi-light font-thin text-stroke-thin text-base mb-6 leading-relaxed tracking-wider text-center">
+        <p className="md:text-base text-sm">
           Install the Liberum extension to seamlessly browse <span className="text-primary">.lib</span> domains. 
         
         </p>
-        <p className="text-base ">
+        <p className="md:text-base text-sm ">
         Liberum automatically detects .lib addresses in your browsers address bar
         </p>
-        <p className="text-base mb-12">  and fetches the corresponding site directly from the blockchain.</p>
+        <p className="md:text-base text-sm mb-12">  and fetches the corresponding site directly from the blockchain.</p>
 
-        <p className="text-lg ">
+        <p className="md:text-lg text-base ">
           Giving you a secure, censorship-resistant way to explore the
         </p>
-        <p className="text-lg mb-6">
+        <p className="md:text-lg text-base mb-6">
 decentralized web.
         </p>
       </div>
