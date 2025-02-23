@@ -41,7 +41,7 @@ const NavbarInstall = () => {
               <>
                 <button 
                   onClick={() => setIsOpen(!isOpen)}
-                  className="px-4 py-2 bg-secondary rounded-lg  font-semibold text-black w-[165px] flex items-center gap-2"
+                  className="px-4 py-2 bg-secondary rounded-lg  font-semibold text-black w-[165px] flex justify-between items-center gap-2"
                 >
                   {`${account.slice(0, 6)}...${account.slice(-4)}`}
                   <span className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
@@ -61,7 +61,7 @@ const NavbarInstall = () => {
                       className="w-full text-left px-4 py-2 text-sm text-black flex justify-between items-center gap-2 font-semibold"
                     >
                       Disconnect
-                      <Image src={Disconnect} alt="Disconnect" width={12} height={12} />
+                      <Image src={Disconnect} alt="Disconnect" width={16} height={16} />
                     </button>
                   </div>
                 )}
