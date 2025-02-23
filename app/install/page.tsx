@@ -13,11 +13,11 @@ const InstallPage = () => {
     <div className='w-full h-screen bg-dark '>
     <NavbarInstall />
     
-    <main className="container max-w-5xl mx-auto mt-12 overflow-y-auto noscrollbar">
+    <main className="container max-w-4xl mx-auto mt-12 overflow-y-auto noscrollbar">
         <div className='pt-20 w-full justify-center items-center'> 
-          <h1 className="text-4xl font-bold mb-4 text-center">       Install Liberum for your browser</h1>
+          <h1 className="text-4xl font-bold mb-6 text-center">       Install Liberum for your browser</h1>
       
-      <p className="text-center text-white font-satoshi-light font-thin text-stroke-thin text-base mb-6 leading-relaxed tracking-wider">
+      <p className="text-center text-white font-satoshi-light font-thin text-stroke-thin text-sm mb-6 leading-relaxed tracking-wider">
         Explore .lib domains—your gateway to the decentralized web.
       </p>
 
@@ -46,7 +46,7 @@ const InstallPage = () => {
           className="absolute right-0 translate-x-1/2"
         />
       </div>
-      <div className='absolute bottom-[88px] max-w-5xl mx-auto bg-[#141414] w-full h-[100px] rounded-2xl flex justify-center items-center'> 
+      <div className='absolute bottom-[88px] max-w-4xl mx-auto bg-[#141414] w-full h-[100px] rounded-2xl flex justify-center items-center'> 
 
       <Link 
         href="https://chrome.google.com/webstore"
@@ -63,17 +63,20 @@ const InstallPage = () => {
       </div>
 
       <div className="max-w-2xl mx-auto mt-28 font-satoshi-light font-thin text-stroke-thin text-base mb-6 leading-relaxed tracking-wider text-center">
-        <p className="text-lg">
+        <p className="text-base">
           Install the Liberum extension to seamlessly browse <span className="text-primary">.lib</span> domains. 
         
         </p>
-        <p className="text-lg ">
+        <p className="text-base ">
         Liberum automatically detects .lib addresses in your browsers address bar
         </p>
-        <p className="text-lg mb-12">  and fetches the corresponding site directly from the blockchain.</p>
+        <p className="text-base mb-12">  and fetches the corresponding site directly from the blockchain.</p>
 
-        <p className="text-xl mb-6">
-          Giving you a secure, censorship-resistant way to explore the decentralized web.
+        <p className="text-lg ">
+          Giving you a secure, censorship-resistant way to explore the
+        </p>
+        <p className="text-lg mb-6">
+decentralized web.
         </p>
       </div>
     </div>
