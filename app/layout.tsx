@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from 'next/font/local'
-
+import Providers from "@/components/Providers";
 
 const myFont = localFont({
   src: [
@@ -44,10 +44,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={myFont.className}
-      >
-        {children}
+      <body className={myFont.className}>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

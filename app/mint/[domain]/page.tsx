@@ -2,11 +2,17 @@
 import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
 import NavbarMint from '@/components/NavbarMint'
+import { useSelector } from 'react-redux'
+import { useMetaMask } from '@/hooks/useMetaMask'
+import type { RootState } from '@/store/store'
+
 
 const MintDomainPage = () => {
   const params = useParams()
   const domain = params.domain as string
   const [years, setYears] = useState(1)
+  const { connect, isConnecting } = useMetaMask()
+  const account = useSelector((state: RootState) => state.wallet.account)
   
   const pricePerYear = 0.0019
   const networkFee = 0.0003
@@ -45,7 +51,7 @@ const MintDomainPage = () => {
           </div>
           </div>
 
-          <div className="max-w-md mx-auto flex justify-between items-center gap-8 mb-20">
+          <div className="max-w-md mx-auto flex justify-between items-center gap-8 mb-16">
             <button 
               onClick={handleDecrement}
               className="w-12 h-12 bg-[#222222] hover:bg-[#333333] rounded-lg flex items-center justify-center text-2xl font-bold transition-colors"
@@ -79,8 +85,18 @@ const MintDomainPage = () => {
               <span>{prices.total} ETH</span>
             </div>
         <div className='w-full flex justify-center items-center'>
-            <button className="w-1/2 bg-primary hover:bg-primary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors">
-              Connect Wallet
+            <button 
+              onClick={connect}
+              disabled={isConnecting}
+              className="w-1/2 bg-secondary hover:bg-secondary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {isConnecting ? (
+                'Bağlanıyor...'
+              ) : account ? (
+                'Mint'
+              ) : (
+                'Connect Wallet'
+              )}
             </button>
             </div>
           </div>

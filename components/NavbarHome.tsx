@@ -1,11 +1,17 @@
+'use client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import { useMetaMask } from '@/hooks/useMetaMask'
+import type { RootState } from '@/store/store'
 
 import Logo from "@/assets/logo.svg"
 import SearchIcon from "@/assets/Search_light.svg"
 
-
 const NavbarHome = () => {
+  const { connect, isConnecting } = useMetaMask()
+  const account = useSelector((state: RootState) => state.wallet.account)
+
   return (
     <nav className=" bg-dark fixed w-full top-0 z-50 h-16">
         <div className=' mx-auto flex items-center justify-between px-10 py-3'>
@@ -22,7 +28,7 @@ const NavbarHome = () => {
         <input 
           type="text"
           placeholder="mammothon"
-          className="w-full px-6 py-2 bg-light rounded-lg text-black border border-light-white focus:outline-none placeholder:text-black"
+          className="w-full px-6 py-2 bg-white rounded-lg text-black border border-light-white focus:outline-none placeholder:text-black"
         />
         <Image src={SearchIcon} alt="Search" width={24} height={24} className='absolute right-4 top-1/2 -translate-y-1/2' />
       </div>
@@ -34,8 +40,18 @@ const NavbarHome = () => {
         <Link href="/mint" className="text-white hover:text-primary font-semibold">
           Mint Your Blockspace
         </Link>
-        <button className="px-4 py-2 bg-secondary rounded-lg hover:bg-opacity-90 font-semibold text-black">
-          Connect Wallet
+        <button 
+          onClick={connect}
+          disabled={isConnecting}
+          className="px-4 py-2 bg-secondary rounded-lg hover:bg-opacity-90 font-semibold text-black"
+        >
+          {isConnecting ? (
+            'Bağlanıyor...'
+          ) : account ? (
+            `${account.slice(0, 6)}...${account.slice(-4)}`
+          ) : (
+            'Connect Wallet'
+          )}
         </button>
       </div>
       </div>
