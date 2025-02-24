@@ -44,7 +44,7 @@ const MintSuccessPage = () => {
       <main className="container max-w-5xl mx-auto mt-12">
         <div className='pt-32 text-center'> 
           <h1 className="text-5xl font-bold mb-6">Your New Blockspace</h1>
-          <p className="text-white font-satoshi-light font-thin text-stroke-thin text-base mb-12 leading-relaxed tracking-wider">
+          <p className="text-gray-300 mb-16 text-lg mt-8">
             You can customize your blockspace view. Set a favicon!
           </p>
 
@@ -104,7 +104,7 @@ const MintSuccessPage = () => {
             </Link>
 
             <Link 
-              href={`/dashboard/${domain}`}
+              href={`/dashboard`}
               className="px-6 py-3 bg-white rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors"
             >
               Go To Your Dashboard

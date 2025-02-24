@@ -55,7 +55,13 @@ const UploadHtmlPage = () => {
     }
   }
   const handleButtonClick = () => {
-    router.push(`/mint/${domain}/dashboard`)
+    router.push(`/mint/${domain}/${fileName}`)
+  }
+  const handleCloseUpload = () => {
+    setUploading(false)
+    setProgress(0)
+    setFileName("")
+    setFileSize(0)
   }
 
   return (
@@ -132,14 +138,14 @@ const UploadHtmlPage = () => {
                 <div className="border-2 border-dashed border-white rounded-2xl [border-spacing:18px] pt-4 px-4 pb-4 flex flex-col relative justify-between">
                   <div className="flex items-stretch gap-x-3">
                     <Image src={FileIcon} alt="html" width={96} height={96} />
-                    <Image src={CloseIcon} alt="close" width={28} height={28} className='cursor-pointer absolute top-6 right-6' onClick={() => setUploading(false)}/>
+                    <Image src={CloseIcon} alt="close" width={28} height={28} className='cursor-pointer absolute top-6 right-6' onClick={() => handleCloseUpload}/>
                     <div className="flex flex-col justify-around">
                       <p className="text-lg font-bold text-start">{fileName}</p>
                       <div className="flex items-center text-gray-400 gap-2 text-start">
                         <span>{formatFileSize(fileSize)}</span>
                         <span className="mx-2">•</span>
-                        <Image src={LoadingIcon} alt="loading" width={20} height={20} />
-                        <span className="text-gray-400">Uploading...</span>
+                        <Image src={LoadingIcon} alt="loading" width={20} height={20} className={`${progress < 100 ? "animate-spin" : ""}`}/>
+                        {progress < 100 ? <span className="text-gray-400">Uploading...</span> : <span className="text-gray-400">Done</span>}
                       </div>
                     </div>
                   </div>
