@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import NavbarMint from '@/components/NavbarMint'
 import { useSelector } from 'react-redux'
 import { useMetaMask } from '@/hooks/useMetaMask'
@@ -9,6 +9,7 @@ import type { RootState } from '@/store/store'
 
 const MintDomainPage = () => {
   const params = useParams()
+  const router = useRouter()
   const domain = params.domain as string
   const [years, setYears] = useState(1)
   const { connect, isConnecting } = useMetaMask()
@@ -35,6 +36,24 @@ const MintDomainPage = () => {
   }
 
   const prices = calculateTotal()
+
+  const handleButtonClick = async () => {
+    if (!account) {
+      await connect();
+    } else {
+      await handleMint();
+    }
+  };
+
+  const handleMint = async () => {
+    try {
+      // TODO: Mint işlemi burada gerçekleşecek
+      
+      router.push(`/mint/${domain}/success`)
+    } catch (error) {
+      console.error('Mint error:', error)
+    }
+  }
 
   return (
     <div className='w-full h-screen bg-dark overflow-hidden'>
@@ -80,13 +99,13 @@ const MintDomainPage = () => {
               <span className="text-gray-400">Est. Network Fee</span>
               <span>{prices.network} ETH</span>
             </div>
-            <div className="flex justify-between items-center mb-8 pt-4 border-t border-gray-800">
+            <div className="flex justify-between items-center mb-8 pt-2">
               <span>Estimated Total</span>
               <span>{prices.total} ETH</span>
             </div>
         <div className='w-full flex justify-center items-center'>
             <button 
-              onClick={connect}
+              onClick={handleButtonClick}
               disabled={isConnecting}
               className="w-1/2 bg-secondary hover:bg-secondary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
             >
