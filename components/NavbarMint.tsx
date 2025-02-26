@@ -34,7 +34,7 @@ const NavbarMint = () => {
                 disabled={isConnecting}
                 className="px-4 py-2 bg-secondary rounded-lg  font-semibold text-black w-[165px]"
               >
-                {isConnecting ? 'Bağlanıyor...' : 'Connect Wallet'}
+                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
               </button>
             ) : (
               <>

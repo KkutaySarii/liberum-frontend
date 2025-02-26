@@ -1,41 +1,17 @@
 'use client'
-import React, { useRef, useState } from 'react'
-import Image from 'next/image'
+import React from 'react'
+// import Image from 'next/image'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 
 import NavbarMint from '@/components/NavbarMint'
-import EditIcon from "@/assets/Edit_fill.svg"
+// import EditIcon from "@/assets/Edit_fill.svg"
+// import { useImageUpload } from '@/hooks/useImageUpload'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
 
 const MintSuccessPage = () => {
-  const params = useParams()
-  const domain = params.domain as string
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
-
-  const handleEditClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-    //   if (file.size > 2 * 1024 * 1024) {
-    //     alert('Dosya boyutu 2MB\'dan küçük olmalıdır.')
-    //     return
-    //   }
-      if (!file.type.startsWith('image/')) {
-        alert('Lütfen bir resim dosyası seçin.')
-        return
-      }
-
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
+  const selectedBlockspace = useSelector((state: RootState) => state.wallet.selectedBlockspace)
+  // const { selectedImage, fileInputRef, handleImageChange, handleEditClick } = useImageUpload(selectedBlockspace)
 
   return (
     <div className='w-full h-screen bg-dark overflow-hidden'>
@@ -48,11 +24,11 @@ const MintSuccessPage = () => {
             You can customize your blockspace view. Set a favicon!
           </p>
 
-          <div 
+          {/* <div 
             className="relative w-36 h-36 mx-auto mb-8 cursor-pointer group"
             onClick={handleEditClick}
           >
-            <div className={`${!selectedImage ? "bg-primary" : "bg-none"} w-full h-full rounded-full flex items-center justify-center overflow-hidden transition-all duration-300`}>
+            <div className={`${!selectedImage ? "bg-primary" : ""} w-full h-full rounded-full flex items-center justify-center overflow-hidden transition-all duration-300`}>
               {selectedImage ? (
                 <>
                   <Image 
@@ -61,7 +37,7 @@ const MintSuccessPage = () => {
                     fill
                     className="object-cover rounded-full"
                   />
-                  <div className="absolute inset-0 bg-white bg-opacity-50 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex items-center justify-center rounded-full">
+                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex items-center justify-center rounded-full">
                     <Image 
                       src={EditIcon} 
                       alt="Edit" 
@@ -88,15 +64,15 @@ const MintSuccessPage = () => {
               accept="image/*"
               className="hidden"
             />
-          </div>
+          </div> */}
 
           <p className="text-3xl font-semibold mb-12">
-            {domain}
+            {selectedBlockspace?.name}
           </p>
 
           <div className="flex justify-center gap-6">
             <Link 
-              href={`/mint/${domain}/upload-html`} 
+              href={`/mint/${selectedBlockspace?.name}/upload-html`} 
               className="px-6 py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors flex justify-items-center gap-2"
             >
                 <p className='font-normal'> Next Step:</p>

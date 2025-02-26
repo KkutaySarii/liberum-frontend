@@ -6,13 +6,35 @@ import Image from 'next/image'
 
 import NavbarMint from '@/components/NavbarMint'
 import Union from '@/assets/Union (1).svg'
-
+import { useRouter } from 'next/navigation'
+import { useHtmlContract } from '@/hooks/useHtmlContract'
 
 const LinkPage = () => {
-    const params = useParams()
-    const domain = params.domain as string
-    const fileName = params.fileName as string
-    const networkFee = 0.0003
+    const router = useRouter()
+    const { domain, fileName } = useParams()
+    const { callContractMethod } = useHtmlContract()
+    const networkFee = 0.003
+
+    const handleLink = async () => {
+      try {
+        if (!domain) {
+          throw new Error('Domain name is required')
+        }
+        if (!fileName) {
+          throw new Error('HTML content is required')
+        }
+  
+        const tx = await callContractMethod(
+          'linkDomain',
+          //event'ten aldığımız page address'i
+        )
+        
+        console.log('Upload transaction:', tx)
+        router.push(`/mint/${domain}/${fileName}/success`)
+      } catch (err) {
+        console.error('Upload error:', err)
+      }
+    }
 
   return (
     <div className='w-full h-screen bg-dark overflow-hidden'>
@@ -60,6 +82,9 @@ const LinkPage = () => {
             <Link 
               href={`/mint/${domain}/${fileName}/success`} 
               className="w-full py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors text-center"
+              onClick={() => {
+                handleLink()
+              }}
             >
               Link
             </Link>

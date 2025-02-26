@@ -6,28 +6,33 @@ import { Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { useRouter } from 'next/navigation'
-import simpleİcon from '@/assets/Union (1).svg'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
+import { SearchResults, Content } from '@/types/walletAccount';
 import NavbarMint from '@/components/NavbarMint'
-
+import { setSelectedBlockspace, setSelectedContent } from '@/store/features/walletSlice'
+import Union from '@/assets/Union (1).svg'
 
 const DashboardPage = () => {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [activeTab, setActiveTab] = useState('blockspace')
+  const { blockspaces, contents } = useSelector((state: RootState) => state.wallet)
 
-  const blockspaceItems = [
-    { name: 'kere.lib', image: simpleİcon },
-    { name: 'keremkaya.lib', image: simpleİcon },
-    { name: 'keremkaya1532.lib', image: simpleİcon },
-  ] as const;
-  const contentItems = [
-    { name: 'index.html', image: simpleİcon },
-    { name: 'keremkaya.html', image: simpleİcon },
-    { name: 'keremkaya1532.html', image: simpleİcon },
-  ] as const;
+
+
+  const handleManageBlockspace = (item: SearchResults) => {
+    dispatch(setSelectedBlockspace(item))
+    router.push(`/dashboard/manage/manage-blockspace`)
+  }
+
+  const handleManageContent = (item: Content) => {
+    dispatch(setSelectedContent(item))
+    router.push(`/dashboard/manage/manage-content`)
+  }
 
   return (
-    <div className='w-full min-h-screen bg-[#121212]'>
+    <div className='w-full min-h-screen bg-dark'>
       <NavbarMint />
 
       <main className="container max-w-2xl mx-auto px-4">
@@ -64,10 +69,10 @@ const DashboardPage = () => {
             >
               <SwiperSlide>
                 <div className="space-y-4">
-                  {blockspaceItems.map((item, index) => (
+                  {blockspaces.map((item, index) => (
                     <div key={index} className="flex items-center justify-between  p-4 rounded-lg">
                       <div className="flex items-center gap-3">
-                      
+                      {/* {item.image ? (
                           <Image
                             src={item.image}
                             alt={item.name}
@@ -75,9 +80,12 @@ const DashboardPage = () => {
                             height={40}
                             className="rounded-full"
                           />
+                        ) : ( */}
+                          <div className="w-10 h-10 bg-primary rounded-full transition-all"></div>
+                        {/* )} */}
                         <span className="text-white text-lg">{item.name}</span>
                       </div>
-                      <button className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors">
+                      <button className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors" onClick={() => handleManageBlockspace(item)}>
                         Manage
                       </button>
                     </div>
@@ -93,12 +101,12 @@ const DashboardPage = () => {
               
               <SwiperSlide>
               <div className="space-y-4">
-                  {contentItems.map((item, index) => (
+                  {contents.map((item, index) => (
                     <div key={index} className="flex items-center justify-between  p-4 rounded-lg">
                       <div className="flex items-center gap-3">
                       
                           <Image
-                            src={item.image}
+                            src={Union}
                             alt={item.name}
                             width={40}
                             height={40}
@@ -106,7 +114,7 @@ const DashboardPage = () => {
                           />
                         <span className="text-white text-lg">{item.name}</span>
                       </div>
-                      <button className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors">
+                      <button className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors" onClick={() => handleManageContent(item)}>
                         Manage
                       </button>
                     </div>

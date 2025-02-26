@@ -1,16 +1,17 @@
 "use client"
 import React from 'react'
-import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
 import Union from '@/assets/Union (1).svg'
 import NavbarMint from '@/components/NavbarMint'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
 
 const LinkSuccessPage = () => {
-  const params = useParams()
-  const domain = params.domain as string
-  const fileName = params.fileName as string
+
+  const selectedBlockspace = useSelector((state: RootState) => state.wallet.selectedBlockspace)
+  const selectedContent = useSelector((state: RootState) => state.wallet.selectedBlockspace)
 
   return (
     <div className='w-full min-h-screen bg-dark overflow-hidden '>
@@ -25,7 +26,7 @@ const LinkSuccessPage = () => {
 
             <div className="flex flex-col items-center">
               <div className="w-40 h-40 bg-primary rounded-full mb-3"></div>
-              <span className="text-white underline text-2xl">{domain}</span>
+              <span className="text-white underline text-2xl">{selectedBlockspace?.name}</span>
             </div>
 
             <div className="w-20 h-[4px] bg-white mt-[-20px] rounded-full"></div>
@@ -34,13 +35,13 @@ const LinkSuccessPage = () => {
               <div className="w-40 h-40 flex items-center justify-center">
               <Image src={Union} alt="icon"  className='object-cover' />
               </div>
-              <span className="text-white underline text-2xl">{fileName}</span>
+              <span className="text-white underline text-2xl">{selectedContent?.name}</span>
             </div>
           </div>
 
           <div className="flex justify-center gap-8 max-w-xl mx-auto">
             <Link 
-              href={`/visit/${domain}/${fileName}`}
+              href={`/visit`}
               className="w-1/2 py-3 bg-secondary text-black rounded-lg hover:bg-opacity-90 transition-colors font-semibold"
             >
               Visit Site

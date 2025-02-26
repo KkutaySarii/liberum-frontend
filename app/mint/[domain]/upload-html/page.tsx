@@ -1,28 +1,40 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useParams, useRouter } from 'next/navigation'
+import {useRouter, useParams } from 'next/navigation'
 import NavbarMint from '@/components/NavbarMint'
 import UploadIcon from "@/assets/cloud.svg"
 import UploadIconWhite from "@/assets/cloudwhite.svg"
 import FileIcon from "@/assets/file.svg"
 import LoadingIcon from "@/assets/loading.svg"
 import CloseIcon from "@/assets/close.svg"
+import Union from "@/assets/Union (1).svg"
+import {  useDispatch } from 'react-redux'
+import { setSelectedContent } from '@/store/features/walletSlice'
+import { useHtmlContract } from '@/hooks/useHtmlContract'
+import { ethers } from 'ethers'
+
 const UploadHtmlPage = () => {
   const [fileEnter, setFileEnter] = useState(false)
   const [fileName, setFileName] = useState<string>("")
   const [fileSize, setFileSize] = useState<number>(0)
   const [progress, setProgress] = useState<number>(0)
   const [uploading, setUploading] = useState<boolean>(false)
-  const params = useParams()
+  const [prices, setPrices] = useState({
+    network: "0",
+    total: "0"
+  })
   const router = useRouter()
-  const domain = params.domain as string
+  const params = useParams()
+  const domain = Array.isArray(params.domain) ? params.domain[0] : params.domain
 
-  const networkFee = 0.0003
+  const dispatch = useDispatch()
+  const { contract, callContractMethod, provider } = useHtmlContract()
+  const [htmlContent, setHtmlContent] = useState<string>('')
 
   const handleFileRead = async (file: File) => {
     if (!file.name.endsWith('.html')) {
-      alert('Lütfen HTML dosyası seçin')
+      alert('Please select an HTML file')
       return
     }
 
@@ -32,12 +44,44 @@ const UploadHtmlPage = () => {
     setProgress(0)
 
     try {
+      const content = await new Promise<string>((resolve) => {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          resolve(e.target?.result as string)
+        }
+        reader.readAsText(file)
+      })
+
+      setHtmlContent(content)
+
+      if (contract && provider) {
+        console.log({content})
+        console.log({file})
+      
+        const estimateGas = await contract.createPage.estimateGas(content, file.name)
+        const networkFee = await provider.getFeeData()
+        
+        if (networkFee?.gasPrice) {
+          const estimatedGasPrice = networkFee.gasPrice * estimateGas
+          setPrices({
+            network: ethers.formatEther(estimatedGasPrice),
+            total: ethers.formatEther(estimatedGasPrice)
+          })
+        }
+      }
+
       for (let i = 0; i <= 100; i += 20) {
         setProgress(i)
         await new Promise(resolve => setTimeout(resolve, 500))
       }
 
-    //   router.push(`/mint/${domain}/dashboard`)
+      dispatch(setSelectedContent({
+        name: file.name,
+        image: Union,
+        linkedBlockspace: null,
+        owner: '',
+        contractAddress: ''
+      }))
 
     } catch (error) {
       console.error('Upload error:', error)
@@ -55,13 +99,56 @@ const UploadHtmlPage = () => {
     }
   }
   const handleButtonClick = () => {
-    router.push(`/mint/${domain}/${fileName}`)
+    handleUpload()
   }
   const handleCloseUpload = () => {
-    setUploading(false)
-    setProgress(0)
-    setFileName("")
+    setFileEnter(false)
+    setFileName('')
     setFileSize(0)
+    setProgress(0)
+    setUploading(false)
+    setHtmlContent('')
+  }
+
+  const handleUpload = async () => {
+    try {
+      if (!domain) {
+        throw new Error('Domain name is required')
+      }
+      if (!htmlContent) {
+        throw new Error('HTML content is required')
+      }
+
+      const tx = await callContractMethod(
+        'createPage',
+        htmlContent,
+        fileName
+      )
+
+      if (!tx?.hash) {
+        throw new Error('Transaction failed')
+      }
+
+      const receipt = await provider?.waitForTransaction(tx.hash)
+
+      if (receipt) {
+        const pageCreatedEvent = receipt.logs.find(log => 
+          log.topics[0] === contract?.interface.getEvent('PageCreated')?.format()
+        )
+
+        if (pageCreatedEvent) {
+          const parsedLog = contract?.interface.parseLog(pageCreatedEvent)
+          const pageAddress = parsedLog?.args[0]
+          console.log('Page Address:', pageAddress)
+          
+          if (pageAddress) {
+            router.push(`/mint/${domain}/${fileName}?address=${pageAddress}`)
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Upload error:', err)
+    }
   }
 
   return (
@@ -138,7 +225,7 @@ const UploadHtmlPage = () => {
                 <div className="border-2 border-dashed border-white rounded-2xl [border-spacing:18px] pt-4 px-4 pb-4 flex flex-col relative justify-between">
                   <div className="flex items-stretch gap-x-3">
                     <Image src={FileIcon} alt="html" width={96} height={96} />
-                    <Image src={CloseIcon} alt="close" width={28} height={28} className='cursor-pointer absolute top-6 right-6' onClick={() => handleCloseUpload}/>
+                    <Image src={CloseIcon} alt="close" width={28} height={28} className='cursor-pointer absolute top-6 right-6' onClick={handleCloseUpload}/>
                     <div className="flex flex-col justify-around">
                       <p className="text-lg font-bold text-start">{fileName}</p>
                       <div className="flex items-center text-gray-400 gap-2 text-start">
@@ -167,16 +254,17 @@ const UploadHtmlPage = () => {
                                     </div>
                                     <div className="flex justify-between items-center mb-4 text-gray-400">
                                       <span className="text-gray-400">Est. Network Fee</span>
-                                      <span>{networkFee} ETH</span>
+                                      <span>{prices.network} ETH</span>
                                     </div>
                                     <div className="flex justify-between items-center mb-8 pt-2">
                                       <span>Estimated Total</span>
-                                      <span>{networkFee } ETH</span>
+                                      <span>{prices.total} ETH</span>
                                     </div>
                                  <div className='w-full flex justify-center items-center'>
                                     <button 
+                                      disabled={!htmlContent || !fileName || progress < 100}
                                       onClick={handleButtonClick}
-                                      className="w-1/2 bg-secondary hover:bg-secondary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
+                                      className="w-1/2 bg-secondary hover:bg-secondary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                     Deploy
                                     </button>

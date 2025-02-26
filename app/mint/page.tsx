@@ -8,25 +8,50 @@ import SearchIcon from "@/assets/Search_light.svg"
 import Arrow from "@/assets/arrow.svg"
 import Arrow2 from "@/assets/arrow2.svg"
 
+import {  useDispatch } from 'react-redux'
+import { setSelectedBlockspace } from '@/store/features/walletSlice'
+import { useSocket } from '@/hooks/useSocket'
+import { SearchResults } from '@/types/walletAccount'
 const MintPage = () => {
+  const dispatch = useDispatch()
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showDomainList, setShowDomainList] = useState(false);
   const [showAllDomains, setShowAllDomains] = useState(false);
   
-  const domains = [
-    { name: 'kere.lib', status: 'Available', bgColor: 'bg-primary' },
-    { name: 'keremkaya.lib', status: 'Registered', bgColor: 'bg-secondary' },
-    { name: 'keremkaya1532.lib', status: 'Available', bgColor: 'bg-secondary' },
-    { name: 'blockchain.lib', status: 'Registered', bgColor: 'bg-primary' },
-    { name: 'web3.lib', status: 'Available', bgColor: 'bg-secondary' },
-    { name: 'crypto.lib', status: 'Registered', bgColor: 'bg-primary' },
-    { name: 'nft.lib', status: 'Available', bgColor: 'bg-secondary' },
-  ];
 
-  const displayedDomains = showAllDomains ? domains : domains.slice(0, 3);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const { socket = null, isConnected = false, connectionError } = useSocket() || {};
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResults[]>([]);
+  const displayedResults = showAllDomains ? searchResults : searchResults.slice(0, 3);
+
+  useEffect(() => {
+    console.log('searchResults', searchResults)
+  }, [searchResults])
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("searchResults", (domains) => {
+      setSearchResults(domains);
+      setShowDomainList(true);
+    });
+
+    return () => {
+      socket.off("searchResults");
+    };
+  }, [socket]);
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    if (socket && isConnected) {
+      socket.emit("searchDomains", value);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -49,6 +74,14 @@ const MintPage = () => {
     }, 300);
   };
 
+  useEffect(() => {
+    console.log("Socket connection status:", {
+      isConnected,
+      hasSocket: !!socket,
+      error: connectionError
+    });
+  }, [isConnected, socket, connectionError]);
+
   return (
     <div className='w-full h-screen bg-dark lg:overflow-hidden overflow-y-auto noscrollbar'>
       <NavbarMint/>
@@ -70,6 +103,8 @@ const MintPage = () => {
             <input 
               ref={inputRef}
               type="text"
+              value={searchTerm}
+              onChange={handleSearchInput}
               placeholder="search for a name"
               className="w-full px-6 py-3 rounded-lg bg-white border border-light-white text-black placeholder:text-black placeholder:!font-thin placeholder:text-2xl placeholder:text-opacity-40 outline-none z-40"
               onFocus={handleInputFocus}
@@ -118,7 +153,7 @@ const MintPage = () => {
 
           <div 
             ref={containerRef}
-            className={`absolute top-[45%] pb-20 right-1/2 w-2/5 translate-x-1/2 transition-all duration-500 max-h-[500px] overflow-y-auto noscrollbar ${
+            className={`absolute top-[45vh] pb-20 right-1/2 w-[70vh] translate-x-1/2 transition-all duration-500 max-h-[500px] overflow-y-auto noscrollbar ${
               isInputFocused ? 'block z-30' : 'hidden'
             } ${
               showDomainList 
@@ -126,7 +161,7 @@ const MintPage = () => {
                 : 'translate-y-10 opacity-0'
             }`}
           >
-            {displayedDomains.map((domain, index) => (
+            {displayedResults.map((domain, index) => (
               <div 
                 key={index} 
                 className={`flex items-center gap-4 mb-4 transition-all duration-300`}
@@ -136,33 +171,36 @@ const MintPage = () => {
                   transform: showDomainList ? 'translateY(0)' : 'translateY(20px)'
                 }}
               >
-                <div className={`w-12 h-12 ${domain.bgColor} rounded-full`}></div>
-                {domain.status === 'Available' ? (
+                <div className="w-12 h-12 rounded-full"></div>
+                {domain.linkedContractAddress === "" ? (
                   <Link 
                     href={`/mint/${domain.name}`} 
                     className="text-xl hover:text-primary transition-colors"
+                    onClick={() => {
+                      dispatch(setSelectedBlockspace(domain))
+                    }}
                   >
                     {domain.name}
                   </Link>
                 ) : (
                   <span className="text-xl">{domain.name}</span>
                 )}
-                <span className={`${domain.status === 'Available' ? 'bg-green-500' : 'bg-blue-500'} px-3 py-1 rounded-full text-sm ml-auto`}>
-                  {domain.status}
+                <span className={`${domain.linkedContractAddress === "" ? 'bg-green-500' : 'bg-blue-500'} px-3 py-1 rounded-full text-sm ml-auto`}>
+                {domain.linkedContractAddress === "" ? 'Available' : 'Registered'}
                 </span>
               </div>
             ))}
             
-            <div className='flex justify-between items-center mt-8'>
-              <button 
-                className="bg-secondary hover:bg-opacity-80 px-2 py-1 rounded-lg text-start text-black font-semibold text-sm"
-                onClick={() => {
-                  setShowAllDomains(!showAllDomains)
-                }}
-              >
-                {showAllDomains ? 'Show Less...' : 'See More...'}
-              </button>
-            </div>
+            {searchResults.length > 3 && (
+              <div className='flex justify-between items-center mt-8'>
+                <button 
+                  className="bg-secondary hover:bg-opacity-80 px-2 py-1 rounded-lg text-start text-black font-semibold text-sm"
+                  onClick={() => setShowAllDomains(!showAllDomains)}
+                >
+                  {showAllDomains ? 'Show Less...' : 'See More...'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>
