@@ -6,12 +6,19 @@ import Link from 'next/link'
 import NavbarMint from '@/components/NavbarMint'
 // import EditIcon from "@/assets/Edit_fill.svg"
 // import { useImageUpload } from '@/hooks/useImageUpload'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store/store'
+import { storage, StorageKeys } from '@/utils/storage'
+import {useRouter} from 'next/navigation'
 
 const MintSuccessPage = () => {
-  const selectedBlockspace = useSelector((state: RootState) => state.wallet.selectedBlockspace)
+  const router = useRouter()
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
   // const { selectedImage, fileInputRef, handleImageChange, handleEditClick } = useImageUpload(selectedBlockspace)
+
+  const handleGoDashboard = () => {
+    storage.set(StorageKeys.SELECTED_DOMAIN, null)
+    storage.set(StorageKeys.SELECTED_FILE, null)
+    router.push(`/dashboard`)
+  }
 
   return (
     <div className='w-full h-screen bg-dark overflow-hidden'>
@@ -67,24 +74,24 @@ const MintSuccessPage = () => {
           </div> */}
 
           <p className="text-3xl font-semibold mb-12">
-            {selectedBlockspace?.name}
+            {selectedDomain?.name}
           </p>
 
           <div className="flex justify-center gap-6">
             <Link 
-              href={`/mint/${selectedBlockspace?.name}/upload-html`} 
+              href={`/mint/domain/upload/upload-html`} 
               className="px-6 py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors flex justify-items-center gap-2"
             >
                 <p className='font-normal'> Next Step:</p>
              <p className='font-semibold'> Link Your Content</p>
             </Link>
 
-            <Link 
-              href={`/dashboard`}
+            <button 
+              onClick={handleGoDashboard}
               className="px-6 py-3 bg-white rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors"
             >
               Go To Your Dashboard
-            </Link>
+            </button>
           </div>
         </div>
       </main>

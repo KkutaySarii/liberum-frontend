@@ -1,12 +1,10 @@
 "use client"
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '@/store/store'
-import { setSelectedBlockspace, setSelectedContent } from '@/store/features/walletSlice'
+
 import { SearchResults, Content } from '@/types/walletAccount'
 import Image from 'next/image'
 import Union from '@/assets/Union (1).svg'
-
+import { storage, StorageKeys } from '@/utils/storage'
 interface ChangeModalProps {
   isOpen: boolean
   onClose: () => void
@@ -14,17 +12,77 @@ interface ChangeModalProps {
 }
 
 const ChangeModal = ({ isOpen, onClose, type }: ChangeModalProps) => {
-  const dispatch = useDispatch()
-  const { blockspaces, contents } = useSelector((state: RootState) => state.wallet)
+  const sampleBlockspaces: SearchResults[] = [
+    {
+      name: "blockspace1",
+      owner: "0x1234...",
+      nft_id: "1",
+      expire_date: "2025-01-01",
+      visit_count: 0,
+      linkedContractAddress: "",
+      linkedContent: null
+    },
+    {
+      name: "blockspace1",
+      owner: "0x1234...",
+      nft_id: "1",
+      expire_date: "2025-01-01",
+      visit_count: 0,
+      linkedContractAddress: "",
+      linkedContent: null
+    },
+    {
+      name: "blockspace2",
+      owner: "0x1234...",
+      nft_id: "1",
+      expire_date: "2025-01-01",
+      visit_count: 0,
+      linkedContractAddress: "",
+      linkedContent: null
+    },
+    {
+      name: "blockspace3",
+      owner: "0x1234...",
+      nft_id: "1",
+      expire_date: "2025-01-01",
+      visit_count: 0,
+      linkedContractAddress: "",
+      linkedContent: null
+    },
+   ]
+   const sampleContents: Content[] = [
+    {
+      name: "content1",
+      image: Union,
+      linkedBlockspace: null,
+      owner: "0x1234...",
+      contractAddress: ""
+    },
+    {
+      name: "content2",
+      image: Union,
+      linkedBlockspace: null,
+      owner: "0x1234...",
+      contractAddress: ""
+    },
+    {
+      name: "content3",
+      image: Union,
+      linkedBlockspace: null,
+      owner: "0x1234...",
+      contractAddress: ""
+    },
+   ]
 
-  const items = type === 'blockspace' ? blockspaces : contents
+
+  const items = type === 'blockspace' ? sampleBlockspaces : sampleContents
 
 
   const handleSelect = (item: SearchResults | Content) => {
     if (type === 'blockspace') {
-      dispatch(setSelectedBlockspace(item as SearchResults))
+      storage.set(StorageKeys.SELECTED_DOMAIN, item as SearchResults)
     } else {
-      dispatch(setSelectedContent(item as Content))
+      storage.set(StorageKeys.SELECTED_FILE, item as Content)
     }
     onClose()
   }

@@ -1,17 +1,16 @@
 "use client"
 import NavbarMint from '@/components/NavbarMint'
-import { RootState } from '@/store/store'
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
 import Image from 'next/image'
 import Link from 'next/link'
 import Union from '@/assets/Union (1).svg'
 import ChangeModal from '@/components/ChangeModal'
 import simpleIcon from '@/assets/Ellipse.svg'
-
+import { storage, StorageKeys } from '@/utils/storage'
 const LinkBlockspacePage = () => {
 
-    const { selectedBlockspace , selectedContent} = useSelector((state: RootState) => state.wallet)
+const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
+const selectedFile = storage.get(StorageKeys.SELECTED_FILE)
     const networkFee = 0.0003
     const [openChangeModal, setOpenChangeModal] = useState(false)
     const [modalType, setModalType] = useState<'blockspace' | 'content'>('blockspace')
@@ -32,7 +31,7 @@ const LinkBlockspacePage = () => {
           <div className="flex items-center justify-center gap-8 mb-10">
 
             <div className="flex flex-col items-center">
-            {selectedBlockspace && selectedBlockspace ? (
+            {selectedDomain && selectedDomain ? (
                                 <div className="w-40 h-40 rounded-full overflow-hidden">
                                     <Image 
                                         src={simpleIcon} 
@@ -45,7 +44,7 @@ const LinkBlockspacePage = () => {
                             ) : (
                                 <div className="w-40 h-40 bg-primary rounded-full"></div>
                             )}
-              <span className="text-white underline text-2xl">{selectedBlockspace?.name}</span>
+              <span className="text-white underline text-2xl">{selectedDomain?.name}</span>
               <button 
                                 className="px-3 py-1 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors mt-3 text-sm font-semibold" 
                                 onClick={() => handleOpenModal('blockspace')}
@@ -60,7 +59,7 @@ const LinkBlockspacePage = () => {
               <div className="w-40 h-40 flex items-center justify-center">
               <Image src={Union} alt="icon"  className='object-cover' />
               </div>
-              <span className="text-white underline text-2xl">{selectedContent?.name}</span>
+              <span className="text-white underline text-2xl">{selectedFile?.name}</span>
               <button className="px-3 py-1 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors text-sm font-semibold mt-3" onClick={() => handleOpenModal('content')}>
                                 Change
                             </button>

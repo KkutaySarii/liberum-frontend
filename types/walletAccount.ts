@@ -29,7 +29,7 @@ export interface Blockspace {
 export interface Content {
   name: string
   image: string
-  linkedBlockspace: Blockspace | null
+  linkedBlockspace: SearchResults | null
   owner: string
   contractAddress: string
 }

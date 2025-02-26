@@ -7,30 +7,33 @@ import NavbarMint from '@/components/NavbarMint'
 import Union from '@/assets/Union (1).svg'
 // import EditIcon from "@/assets/Edit_fill.svg"
 // import { useImageUpload } from '@/hooks/useImageUpload'
-import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '@/store/store'
-import { unlinkContent } from '@/store/features/walletSlice'
+import { storage, StorageKeys } from '@/utils/storage'
 
 
 const ManageBlockspacePage = () => {
   const router = useRouter()
-  const { selectedBlockspace } = useSelector((state: RootState) => state.wallet)
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
+  const selectedFile = storage.get(StorageKeys.SELECTED_FILE)
   // const { selectedImage, fileInputRef, handleImageChange, handleEditClick } = useImageUpload(selectedBlockspace)
-  const linkedContent = selectedBlockspace?.linkedContent
-  const owner = selectedBlockspace?.owner
+  const linkedContent = selectedDomain?.linkedContent
+  const owner = selectedDomain?.owner
   const expiry = "26.04.2001" //TODOO contractten al
-  const dispatch = useDispatch()
 
-  useEffect(() => {
-console.log(selectedBlockspace)
-
-  }, [selectedBlockspace])
 
   const handleUnlink = () => {
-    if (selectedBlockspace) {
-      dispatch(unlinkContent(selectedBlockspace.name))
+    if (selectedFile) {
+      //TODO: Unlink Content
+      storage.set(StorageKeys.SELECTED_FILE, null)
     }
   }
+  useEffect(() => {
+    if (linkedContent) {
+      storage.set(StorageKeys.SELECTED_FILE, linkedContent)
+    }else{
+      storage.set(StorageKeys.SELECTED_FILE, null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className='w-full h-screen bg-dark overflow-hidden'>
@@ -81,7 +84,7 @@ console.log(selectedBlockspace)
                 className="hidden"
               />
             </div> */}
-            <span className="text-2xl text-white">{selectedBlockspace?.name}</span>
+            <span className="text-2xl text-white">{selectedDomain?.name}</span>
           </div>
 
           <div className="mb-16 container max-w-lg mx-auto">
@@ -133,7 +136,7 @@ console.log(selectedBlockspace)
               <h2 className="text-2xl text-white mb-4">Expiry</h2>
                 <p className="text-gray-400">{expiry}</p>
                 </div>
-                <button className="px-2 py-1 font-semibold text-xs bg-secondary text-black rounded hover:bg-opacity-90 transition-colors" onClick={() => router.push(`/mint/${selectedBlockspace?.name}`)}>
+                <button className="px-2 py-1 font-semibold text-xs bg-secondary text-black rounded hover:bg-opacity-90 transition-colors" onClick={() => router.push(`/mint/${selectedDomain?.name}`)}>
                   Extend
                 </button>
          

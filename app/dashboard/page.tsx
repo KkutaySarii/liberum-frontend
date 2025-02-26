@@ -6,29 +6,97 @@ import { Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { useRouter } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '@/store/store'
+
 import { SearchResults, Content } from '@/types/walletAccount';
 import NavbarMint from '@/components/NavbarMint'
-import { setSelectedBlockspace, setSelectedContent } from '@/store/features/walletSlice'
 import Union from '@/assets/Union (1).svg'
-
+import { storage, StorageKeys } from '@/utils/storage'
 const DashboardPage = () => {
   const router = useRouter()
-  const dispatch = useDispatch()
   const [activeTab, setActiveTab] = useState('blockspace')
-  const { blockspaces, contents } = useSelector((state: RootState) => state.wallet)
-
+ const sampleBlockspaces: SearchResults[] = [
+  {
+    name: "blockspace1",
+    owner: "0x1234...",
+    nft_id: "1",
+    expire_date: "2025-01-01",
+    visit_count: 0,
+    linkedContractAddress: "",
+    linkedContent: null
+  },
+  {
+    name: "blockspace1",
+    owner: "0x1234...",
+    nft_id: "1",
+    expire_date: "2025-01-01",
+    visit_count: 0,
+    linkedContractAddress: "",
+    linkedContent: null
+  },
+  {
+    name: "blockspace2",
+    owner: "0x1234...",
+    nft_id: "1",
+    expire_date: "2025-01-01",
+    visit_count: 0,
+    linkedContractAddress: "",
+    linkedContent: null
+  },
+  {
+    name: "blockspace3",
+    owner: "0x1234...",
+    nft_id: "1",
+    expire_date: "2025-01-01",
+    visit_count: 0,
+    linkedContractAddress: "",
+    linkedContent: null
+  },
+ ]
+ const sampleContents: Content[] = [
+  {
+    name: "content1",
+    image: Union,
+    linkedBlockspace: null,
+    owner: "0x1234...",
+    contractAddress: ""
+  },
+  {
+    name: "content2",
+    image: Union,
+    linkedBlockspace: null,
+    owner: "0x1234...",
+    contractAddress: ""
+  },
+  {
+    name: "content3",
+    image: Union,
+    linkedBlockspace: null,
+    owner: "0x1234...",
+    contractAddress: ""
+  },
+ ]
 
 
   const handleManageBlockspace = (item: SearchResults) => {
-    dispatch(setSelectedBlockspace(item))
+    storage.set(StorageKeys.SELECTED_DOMAIN, item)
+    storage.set(StorageKeys.SELECTED_FILE, null)
     router.push(`/dashboard/manage/manage-blockspace`)
   }
 
   const handleManageContent = (item: Content) => {
-    dispatch(setSelectedContent(item))
+    storage.set(StorageKeys.SELECTED_FILE, item)
+    storage.set(StorageKeys.SELECTED_DOMAIN, null)
     router.push(`/dashboard/manage/manage-content`)
+  }
+
+  const handleAdd = (type: string) => {
+    storage.set(StorageKeys.SELECTED_DOMAIN, null)
+    storage.set(StorageKeys.SELECTED_FILE, null)
+    if(type === "blockspace"){
+      router.push(`/mint/`)
+    }else{
+      router.push(`/mint/domain/upload`)
+    }
   }
 
   return (
@@ -69,7 +137,7 @@ const DashboardPage = () => {
             >
               <SwiperSlide>
                 <div className="space-y-4">
-                  {blockspaces.map((item, index) => (
+                  {sampleBlockspaces.map((item, index) => (
                     <div key={index} className="flex items-center justify-between  p-4 rounded-lg">
                       <div className="flex items-center gap-3">
                       {/* {item.image ? (
@@ -93,7 +161,7 @@ const DashboardPage = () => {
                   
                   <div className='w-full items-center flex justify-center'>
                   <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
-                    <span className="text-black text-3xl" onClick={() => router.push('/mint')}>+</span>
+                    <span className="text-black text-3xl" onClick={() => handleAdd("blockspace")}>+</span>
                   </button>
                   </div>
                 </div>
@@ -101,7 +169,7 @@ const DashboardPage = () => {
               
               <SwiperSlide>
               <div className="space-y-4">
-                  {contents.map((item, index) => (
+                  {sampleContents.map((item, index) => (
                     <div key={index} className="flex items-center justify-between  p-4 rounded-lg">
                       <div className="flex items-center gap-3">
                       
@@ -122,7 +190,7 @@ const DashboardPage = () => {
                   
                   <div className='w-full items-center flex justify-center'>
                   <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
-                    <span className="text-black text-3xl" onClick={() => router.push('/mint')}>+</span>
+                    <span className="text-black text-3xl" onClick={() => handleAdd("content")}>+</span>
                   </button>
                   </div>
                 </div>

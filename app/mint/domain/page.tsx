@@ -1,17 +1,17 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import NavbarMint from '@/components/NavbarMint'
 import { useSelector } from 'react-redux'
 import { useMetaMask } from '@/hooks/useMetaMask'
 import { useContract } from '@/hooks/useContract'
 import { ethers } from 'ethers'
 import type { RootState } from '@/store/store'
+import { storage, StorageKeys } from '@/utils/storage'
 
 const MintDomainPage = () => {
   const router = useRouter()
-  const params = useParams()
-  const domain = Array.isArray(params.domain) ? params.domain[0] : params.domain
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
 
   const [years, setYears] = useState(1)
   const [prices, setPrices] = useState({
@@ -43,7 +43,7 @@ const MintDomainPage = () => {
       try {
         console.log('girdi')
         const yearsInSeconds = yearsToSeconds(years);
-        const estimateGas = await contract.mintDomain.estimateGas(domain, yearsInSeconds)
+        const estimateGas = await contract.mintDomain.estimateGas(selectedDomain, yearsInSeconds)
 
         const networkFee = await provider.getFeeData()
         if (!networkFee?.gasPrice) return;
@@ -81,7 +81,7 @@ const MintDomainPage = () => {
 
   const handleMint = async () => {
     try {
-      if (!domain) {
+      if (!selectedDomain?.name) {
         throw new Error('Domain name is required');
       }
 
@@ -89,13 +89,13 @@ const MintDomainPage = () => {
       
       const tx = await callContractMethod(
         'mintDomain',
-        domain,
+        selectedDomain?.name,
         yearsInSeconds,
         { value: ethers.parseEther(prices.total) }
       );
       
       console.log('Mint transaction:', tx);
-      router.push(`/mint/${domain}/success`);
+      router.push(`/mint/domain/success`);
     } catch (err) {
       console.error('Mint error:', err);
     }
@@ -112,7 +112,7 @@ const MintDomainPage = () => {
           <div className="flex items-center justify-between mb-12">
             <div className='flex items-center justify-center gap-4'>
             <div className="w-11 h-11 bg-primary rounded-full"></div>
-            <span className="text-2xl">{domain}</span>
+            <span className="text-2xl">{selectedDomain?.name}</span>
           </div>
           </div>
 

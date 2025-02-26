@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { setAccount } from '@/store/features/walletSlice'
 import type { AppDispatch } from '@/store/store'
+import { storage, StorageKeys } from '@/utils/storage'
 
 type EthereumWindow = {
   ethereum?: {
@@ -65,6 +66,8 @@ export const useMetaMask = () => {
   const disconnect = () => {
     dispatch(setAccount(''))
     setIsOpen(false)
+    storage.remove(StorageKeys.SELECTED_DOMAIN)
+    storage.remove(StorageKeys.SELECTED_FILE)
   }
 
   return { connect, disconnect, isConnecting, isOpen, setIsOpen }

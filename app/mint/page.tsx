@@ -1,19 +1,18 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import NavbarMint from '@/components/NavbarMint'
 import SearchIcon from "@/assets/Search_light.svg"
 import Arrow from "@/assets/arrow.svg"
 import Arrow2 from "@/assets/arrow2.svg"
 
-import {  useDispatch } from 'react-redux'
-import { setSelectedBlockspace } from '@/store/features/walletSlice'
 import { useSocket } from '@/hooks/useSocket'
 import { SearchResults } from '@/types/walletAccount'
+import { storage, StorageKeys } from '@/utils/storage'
+
 const MintPage = () => {
-  const dispatch = useDispatch()
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showDomainList, setShowDomainList] = useState(false);
   const [showAllDomains, setShowAllDomains] = useState(false);
@@ -26,6 +25,8 @@ const MintPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResults[]>([]);
   const displayedResults = showAllDomains ? searchResults : searchResults.slice(0, 3);
+
+  const router = useRouter()
 
   useEffect(() => {
     console.log('searchResults', searchResults)
@@ -81,6 +82,12 @@ const MintPage = () => {
       error: connectionError
     });
   }, [isConnected, socket, connectionError]);
+
+  const handleDomainSelect = (domain: SearchResults) => {
+    storage.set(StorageKeys.SELECTED_DOMAIN, domain);
+    storage.set(StorageKeys.SELECTED_FILE, null)
+    router.push(`/mint/domain`);
+  };
 
   return (
     <div className='w-full h-screen bg-dark lg:overflow-hidden overflow-y-auto noscrollbar'>
@@ -173,15 +180,14 @@ const MintPage = () => {
               >
                 <div className="w-12 h-12 rounded-full"></div>
                 {domain.linkedContractAddress === "" ? (
-                  <Link 
-                    href={`/mint/${domain.name}`} 
+                  <button 
                     className="text-xl hover:text-primary transition-colors"
                     onClick={() => {
-                      dispatch(setSelectedBlockspace(domain))
+                      handleDomainSelect(domain)
                     }}
                   >
                     {domain.name}
-                  </Link>
+                  </button>
                 ) : (
                   <span className="text-xl">{domain.name}</span>
                 )}

@@ -4,28 +4,31 @@ import Link from 'next/link'
 import Image from 'next/image'
 import NavbarMint from '@/components/NavbarMint'
 import Union from '@/assets/Union (1).svg'
-import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '@/store/store'
-import { unlinkBlockspace } from '@/store/features/walletSlice'
+import { storage, StorageKeys } from '@/utils/storage'
 
 
 const ManageContentPage = () => {
-  const { selectedContent } = useSelector((state: RootState) => state.wallet)
-  const linkedBlockspace = selectedContent?.linkedBlockspace
-  const owner = selectedContent?.owner
-  const contractAddress = selectedContent?.contractAddress
-  const dispatch = useDispatch()
+const selectedFile = storage.get(StorageKeys.SELECTED_FILE)
+const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
+  const linkedBlockspace = selectedFile?.linkedBlockspace
+  const owner = selectedFile?.owner
+  const contractAddress = selectedFile?.contractAddress
 
-  useEffect(() => {
-console.log(selectedContent)
-
-  }, [selectedContent])
 
   const handleUnlink = () => {
-    if (selectedContent) {
-      dispatch(unlinkBlockspace(selectedContent.name))
+    if (selectedDomain) {
+       //TODO: Unlink Domain
+       storage.set(StorageKeys.SELECTED_DOMAIN, null)
     }
   }
+  useEffect(() => {
+    if (linkedBlockspace) {
+      storage.set(StorageKeys.SELECTED_DOMAIN, linkedBlockspace)
+    }else{
+      storage.set(StorageKeys.SELECTED_DOMAIN, null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className='w-full h-screen bg-dark overflow-hidden'>
@@ -38,7 +41,7 @@ console.log(selectedContent)
     
           <div className="flex items-center gap-3 mb-6">
           <Image src={Union} alt="icon" width={40} height={40} className='object-cover' />
-            <span className="text-2xl text-white">{selectedContent?.name}</span>
+            <span className="text-2xl text-white">{selectedFile?.name}</span>
           </div>
 
           <div className="mb-16 container max-w-lg mx-auto">
@@ -48,15 +51,7 @@ console.log(selectedContent)
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    {linkedBlockspace.image ? (
-                    <Image
-                                src={linkedBlockspace.image}
-                      alt={linkedBlockspace.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                    ) : (
+    
                       <Image
                         src={Union}
                         alt={linkedBlockspace.name}
@@ -64,7 +59,7 @@ console.log(selectedContent)
                         height={40}
                         className="rounded-full"
                       />
-                    )}
+
                     <span className="text-white text-lg">{linkedBlockspace.name}</span>
                   </div>
                   <button 

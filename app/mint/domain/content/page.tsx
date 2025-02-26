@@ -1,26 +1,25 @@
 "use client"
 import React from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
 import Image from 'next/image'
 
 import NavbarMint from '@/components/NavbarMint'
 import Union from '@/assets/Union (1).svg'
 import { useRouter } from 'next/navigation'
 import { useHtmlContract } from '@/hooks/useHtmlContract'
-
+import { storage, StorageKeys } from '@/utils/storage'
 const LinkPage = () => {
-    const router = useRouter()
-    const { domain, fileName } = useParams()
+  const router = useRouter()
+    const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
+    const selectedFile = storage.get(StorageKeys.SELECTED_FILE)
     const { callContractMethod } = useHtmlContract()
     const networkFee = 0.003
 
     const handleLink = async () => {
       try {
-        if (!domain) {
+        if (!selectedDomain?.name) {
           throw new Error('Domain name is required')
         }
-        if (!fileName) {
+        if (!selectedFile?.name) {
           throw new Error('HTML content is required')
         }
   
@@ -30,10 +29,16 @@ const LinkPage = () => {
         )
         
         console.log('Upload transaction:', tx)
-        router.push(`/mint/${domain}/${fileName}/success`)
+        router.push(`/mint/domain/content/success`)
       } catch (err) {
         console.error('Upload error:', err)
       }
+    }
+
+    const handleDoItLater = () => {
+      storage.set(StorageKeys.SELECTED_DOMAIN, null)
+      storage.set(StorageKeys.SELECTED_FILE, null)
+      router.push(`/dashboard`)
     }
 
   return (
@@ -47,7 +52,7 @@ const LinkPage = () => {
         <div className="flex items-center justify-between mb-12">
           <div className='flex items-center gap-4'>
             <div className="w-11 h-11 bg-primary rounded-full"></div>
-            <span className="text-2xl">{domain}</span>
+            <span className="text-2xl">{selectedDomain?.name}</span>
           </div>
         </div>
 <div className='max-w-lg mx-auto flex justify-between items-center'>
@@ -55,7 +60,7 @@ const LinkPage = () => {
         <Image src={Union} alt="icon" width={120} height={120} />
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-4xl underline">{fileName}</h3>
+              <h3 className="text-4xl underline">{selectedFile?.name}</h3>
             </div>
             <div className="text-gray-400 mb-1 text-xl">CA : <span className="underline">0x897asfda0fsa0af8as..</span></div>
             <div className="text-gray-400 text-xl">Linked with : N/A</div>
@@ -79,21 +84,20 @@ const LinkPage = () => {
   
         </div>
         <div className="flex justify-center gap-8 max-w-xl mx-auto">
-            <Link 
-              href={`/mint/${domain}/${fileName}/success`} 
+            <button 
               className="w-full py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors text-center"
               onClick={() => {
                 handleLink()
               }}
             >
               Link
-            </Link>
-            <Link 
-              href={`/dashboard`}
+            </button>
+            <button 
+              onClick={handleDoItLater}
               className="w-full py-3 bg-white rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors text-center"
             >
               Do It Later
-            </Link>
+            </button>
           </div>
       </div>
     </main>

@@ -5,13 +5,13 @@ import Image from 'next/image'
 
 import Union from '@/assets/Union (1).svg'
 import NavbarMint from '@/components/NavbarMint'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store/store'
+import { storage, StorageKeys } from '@/utils/storage'
+
 
 const LinkSuccessPage = () => {
 
-  const selectedBlockspace = useSelector((state: RootState) => state.wallet.selectedBlockspace)
-  const selectedContent = useSelector((state: RootState) => state.wallet.selectedBlockspace)
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
+const selectedFile = storage.get(StorageKeys.SELECTED_FILE)
 
   return (
     <div className='w-full min-h-screen bg-dark overflow-hidden '>
@@ -26,7 +26,7 @@ const LinkSuccessPage = () => {
 
             <div className="flex flex-col items-center">
               <div className="w-40 h-40 bg-primary rounded-full mb-3"></div>
-              <span className="text-white underline text-2xl">{selectedBlockspace?.name}</span>
+              <span className="text-white underline text-2xl">{ selectedDomain?.name}</span>
             </div>
 
             <div className="w-20 h-[4px] bg-white mt-[-20px] rounded-full"></div>
@@ -35,7 +35,7 @@ const LinkSuccessPage = () => {
               <div className="w-40 h-40 flex items-center justify-center">
               <Image src={Union} alt="icon"  className='object-cover' />
               </div>
-              <span className="text-white underline text-2xl">{selectedContent?.name}</span>
+              <span className="text-white underline text-2xl">{selectedFile?.name}</span>
             </div>
           </div>
 

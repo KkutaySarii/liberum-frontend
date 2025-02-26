@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image'
-import {useRouter, useParams } from 'next/navigation'
+import {useRouter } from 'next/navigation'
 import NavbarMint from '@/components/NavbarMint'
 import UploadIcon from "@/assets/cloud.svg"
 import UploadIconWhite from "@/assets/cloudwhite.svg"
@@ -9,11 +9,9 @@ import FileIcon from "@/assets/file.svg"
 import LoadingIcon from "@/assets/loading.svg"
 import CloseIcon from "@/assets/close.svg"
 import Union from "@/assets/Union (1).svg"
-import {  useDispatch } from 'react-redux'
-import { setSelectedContent } from '@/store/features/walletSlice'
 import { useHtmlContract } from '@/hooks/useHtmlContract'
 import { ethers } from 'ethers'
-
+import { storage, StorageKeys } from '@/utils/storage'
 const UploadHtmlPage = () => {
   const [fileEnter, setFileEnter] = useState(false)
   const [fileName, setFileName] = useState<string>("")
@@ -25,10 +23,7 @@ const UploadHtmlPage = () => {
     total: "0"
   })
   const router = useRouter()
-  const params = useParams()
-  const domain = Array.isArray(params.domain) ? params.domain[0] : params.domain
-
-  const dispatch = useDispatch()
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
   const { contract, callContractMethod, provider } = useHtmlContract()
   const [htmlContent, setHtmlContent] = useState<string>('')
 
@@ -75,13 +70,6 @@ const UploadHtmlPage = () => {
         await new Promise(resolve => setTimeout(resolve, 500))
       }
 
-      dispatch(setSelectedContent({
-        name: file.name,
-        image: Union,
-        linkedBlockspace: null,
-        owner: '',
-        contractAddress: ''
-      }))
 
     } catch (error) {
       console.error('Upload error:', error)
@@ -112,7 +100,7 @@ const UploadHtmlPage = () => {
 
   const handleUpload = async () => {
     try {
-      if (!domain) {
+      if (!selectedDomain) {
         throw new Error('Domain name is required')
       }
       if (!htmlContent) {
@@ -128,6 +116,13 @@ const UploadHtmlPage = () => {
       if (!tx?.hash) {
         throw new Error('Transaction failed')
       }
+      storage.set(StorageKeys.SELECTED_FILE, {
+        name: fileName,
+        image: Union,
+        linkedBlockspace: null,
+        owner: '',
+        contractAddress: ''
+       })
 
       const receipt = await provider?.waitForTransaction(tx.hash)
 
@@ -141,8 +136,15 @@ const UploadHtmlPage = () => {
           const pageAddress = parsedLog?.args[0]
           console.log('Page Address:', pageAddress)
           
-          if (pageAddress) {
-            router.push(`/mint/${domain}/${fileName}?address=${pageAddress}`)
+          if (selectedDomain) {
+            if(pageAddress){
+              router.push(`/mint/domain/content?address=${pageAddress}`)
+            }else{
+              router.push(`/mint/domain/content`)
+            }
+          }
+          else {
+            router.push(`/dashboard/manage/select-blockspace`)  //kereme sor
           }
         }
       }
