@@ -15,12 +15,19 @@ import toast from "react-hot-toast";
 
 const MintDomainPage = () => {
   const searchParams = useSearchParams();
-  const type = searchParams.get("type");
+  const [type, setType] = useState<string | null>(null);
   const router = useRouter();
   const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN);
   const [tokenId, setTokenId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!searchParams) {
+      return;
+    }
+    setType(searchParams.get("type"));
+  }, [searchParams]);
 
   const [years, setYears] = useState(1);
   const [prices, setPrices] = useState({
