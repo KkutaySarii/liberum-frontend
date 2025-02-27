@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
-const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3030"; 
+const SOCKET_SERVER_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3030";
 
 export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -14,13 +15,11 @@ export const useSocket = () => {
 
     const connectSocket = () => {
       try {
-        console.log(`Attempting to connect to socket server: ${SOCKET_SERVER_URL}`);
-        
         const newSocket = io(SOCKET_SERVER_URL, {
           reconnectionAttempts: maxRetries,
           timeout: 10000,
-          transports: ['websocket', 'polling'],
-          forceNew: true
+          transports: ["websocket", "polling"],
+          forceNew: true,
         });
 
         newSocket.on("connect", () => {
@@ -38,23 +37,29 @@ export const useSocket = () => {
 
         newSocket.on("connect_error", (error) => {
           retryCount++;
-          console.log(`Connection attempt ${retryCount} failed:`, error.message);
-          
+          console.log(
+            `Connection attempt ${retryCount} failed:`,
+            error.message
+          );
+
           if (retryCount >= maxRetries) {
             console.log("Max retries reached, stopping connection attempts");
-            setConnectionError(`Failed to connect after ${maxRetries} attempts`);
+            setConnectionError(
+              `Failed to connect after ${maxRetries} attempts`
+            );
             newSocket.close();
           }
-          
+
           setIsConnected(false);
           setSocket(null);
         });
 
         return newSocket;
-
       } catch (error) {
         console.error("Socket initialization error:", error);
-        setConnectionError(error instanceof Error ? error.message : "Unknown error");
+        setConnectionError(
+          error instanceof Error ? error.message : "Unknown error"
+        );
         setIsConnected(false);
         setSocket(null);
         return null;
