@@ -1,4 +1,5 @@
 export interface SearchResults {
+  _id: string;
   name: string;
   owner: string;
   nft_id: string;

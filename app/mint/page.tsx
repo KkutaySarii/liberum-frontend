@@ -34,10 +34,6 @@ const MintPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("searchResults", searchResults);
-  }, [searchResults]);
-
-  useEffect(() => {
     if (!socket) return;
 
     socket.on("searchResults", (domains) => {
@@ -232,7 +228,7 @@ const MintPage = () => {
                 {domain?.image_url && !!domain?.linkedContractAddress && (
                   <div className="w-12 aspect-square relative rounded-full">
                     <Image
-                      src={domain?.image_url}
+                      src={domain?.image_url || ""}
                       alt=""
                       fill
                       className="rounded-full"
@@ -241,7 +237,8 @@ const MintPage = () => {
                   </div>
                 )}
                 {(domain?.linkedContractAddress === "" ||
-                  !domain?.linkedContractAddress) && (
+                  !domain?.linkedContractAddress ||
+                  !domain?.image_url) && (
                   <div className="h-12 w-12 rounded-full"></div>
                 )}
                 {domain?.linkedContractAddress === "" ||

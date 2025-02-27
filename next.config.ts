@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "upload.wikimedia.org",
       },
+      {
+        protocol: "https",
+        hostname: "liberum-bucket.s3.eu-west-3.amazonaws.com",
+      },
     ],
   },
 };

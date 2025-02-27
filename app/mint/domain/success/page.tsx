@@ -1,92 +1,52 @@
-'use client'
-import React from 'react'
-// import Image from 'next/image'
-import Link from 'next/link'
+"use client";
+import React from "react";
+import Link from "next/link";
 
-import NavbarMint from '@/components/NavbarMint'
-// import EditIcon from "@/assets/Edit_fill.svg"
-// import { useImageUpload } from '@/hooks/useImageUpload'
-import { storage, StorageKeys } from '@/utils/storage'
-import {useRouter} from 'next/navigation'
+import NavbarMint from "@/components/NavbarMint";
+import { storage, StorageKeys } from "@/utils/storage";
+import { useRouter } from "next/navigation";
+import { ImageUpload } from "@/components/common/image-upload";
 
 const MintSuccessPage = () => {
-  const router = useRouter()
-  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
-  // const { selectedImage, fileInputRef, handleImageChange, handleEditClick } = useImageUpload(selectedBlockspace)
+  const router = useRouter();
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN);
 
   const handleGoDashboard = () => {
-    storage.set(StorageKeys.SELECTED_DOMAIN, null)
-    storage.set(StorageKeys.SELECTED_FILE, null)
-    router.push(`/dashboard`)
+    storage.set(StorageKeys.SELECTED_DOMAIN, null);
+    storage.set(StorageKeys.SELECTED_FILE, null);
+    router.push(`/dashboard`);
+  };
+
+  if (!selectedDomain) {
+    router.push("/home");
+    return;
   }
 
   return (
-    <div className='w-full h-screen bg-dark overflow-hidden'>
+    <div className="w-full h-screen bg-dark overflow-hidden">
       <NavbarMint />
 
       <main className="container max-w-5xl mx-auto mt-12">
-        <div className='pt-32 text-center'> 
+        <div className="pt-32 text-center">
           <h1 className="text-5xl font-bold mb-6">Your New Blockspace</h1>
           <p className="text-gray-300 mb-16 text-lg mt-8">
             You can customize your blockspace view. Set a favicon!
           </p>
 
-          {/* <div 
-            className="relative w-36 h-36 mx-auto mb-8 cursor-pointer group"
-            onClick={handleEditClick}
-          >
-            <div className={`${!selectedImage ? "bg-primary" : ""} w-full h-full rounded-full flex items-center justify-center overflow-hidden transition-all duration-300`}>
-              {selectedImage ? (
-                <>
-                  <Image 
-                    src={selectedImage}
-                    alt="Selected" 
-                    fill
-                    className="object-cover rounded-full"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex items-center justify-center rounded-full">
-                    <Image 
-                      src={EditIcon} 
-                      alt="Edit" 
-                      width={32} 
-                      height={32} 
-                      className="opacity-80"
-                    />
-                  </div>
-                </>
-              ) : (
-                <Image 
-                  src={EditIcon} 
-                  alt="Edit" 
-                  width={32} 
-                  height={32} 
-                  className="opacity-80"
-                />
-              )}
-            </div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-              accept="image/*"
-              className="hidden"
-            />
-          </div> */}
+          <ImageUpload domain_id={selectedDomain?._id} />
 
-          <p className="text-3xl font-semibold mb-12">
-            {selectedDomain?.name}
-          </p>
+          <p className="text-3xl font-semibold mb-12">{selectedDomain?.name}</p>
 
           <div className="flex justify-center gap-6">
-            <Link 
-              href={`/mint/domain/upload`} 
+            <Link
+              href={`/mint/domain/upload`}
               className="px-6 py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors flex justify-items-center gap-2"
             >
-                <p className='font-normal'> Next Step:</p>
-             <p className='font-semibold'> Link Your Content</p>
+              <p className="font-normal"> Next Step:</p>
+              <p className="font-semibold"> Link Your Content</p>
             </Link>
 
-            <button 
+            <button
               onClick={handleGoDashboard}
               className="px-6 py-3 bg-white rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors"
             >
@@ -96,7 +56,7 @@ const MintSuccessPage = () => {
         </div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default MintSuccessPage 
+export default MintSuccessPage;
