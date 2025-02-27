@@ -3,6 +3,7 @@ import Image from "next/image";
 import { List } from "./List";
 import { Top } from "./Top";
 import Map from "@/assets/Map.svg";
+import ListView from "@/assets/Status_list.svg";
 import { useEffect, useState } from "react";
 import { DomainMap } from "./DomainMap";
 import { DomianList } from "@/types/home";
@@ -79,10 +80,17 @@ const HomeScreen = () => {
       </div>
       <button
         onClick={changeScreenType}
-        className="fixed px-2 right-[50px] flex items-center rounded-md gap-x-4 bottom-10 py-1 bg-primary hover:bg-primary/90"
+        className="fixed px-2 z-50 right-[50px] flex items-center rounded-md gap-x-4 bottom-10 py-1 bg-primary hover:bg-primary/90"
       >
-        <Image src={Map} alt="map" />
-        <p className="text-black">Blockspace Map</p>
+        <Image
+          src={screenType === "list" ? Map : ListView}
+          alt="map"
+          width={screenType === "list" ? 24 : 16}
+          height={screenType === "list" ? 24 : 16}
+        />
+        <p className="text-black">
+          {screenType === "list" ? "Blockspace Map" : "List View"}
+        </p>
       </button>
     </div>
   );

@@ -1,36 +1,33 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import localFont from 'next/font/local'
+import localFont from "next/font/local";
 import Providers from "@/components/Providers";
 
 const myFont = localFont({
   src: [
     {
-      path: '../public/fonts/Satoshi-Regular.woff2',
-      weight: '400',
-      style: 'normal',
+      path: "../public/fonts/Satoshi-Regular.woff2",
+      weight: "400",
+      style: "normal",
     },
     {
-      path: '../public/fonts/Satoshi-Bold.woff2',
-      weight: '700',
-      style: 'normal',
+      path: "../public/fonts/Satoshi-Bold.woff2",
+      weight: "700",
+      style: "normal",
     },
     {
-      path: '../public/fonts/Satoshi-Medium.woff2',
-      weight: '500',
-      style: 'normal',
+      path: "../public/fonts/Satoshi-Medium.woff2",
+      weight: "500",
+      style: "normal",
     },
     {
-      path: '../public/fonts/Satoshi-Light.woff2',
-      weight: '300',
-      style: 'normal',
+      path: "../public/fonts/Satoshi-Light.woff2",
+      weight: "300",
+      style: "normal",
     },
-
-    
-    
   ],
-  display: 'swap',
-})
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Liberum",
@@ -44,10 +41,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={myFont.className}>
-        <Providers>
-          {children}
-        </Providers>
+      <body className={myFont.className} suppressHydrationWarning={true}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Placeholder from "@/assets/placeholder.svg";
 
 interface DomianListItem {
   domain: string;
@@ -16,7 +17,7 @@ export const DomainMap = ({ domains }: { domains: DomianList }) => {
   return (
     <div className="relative">
       <motion.div className="flex flex-wrap gap-6 my-10" layout>
-        {domains.map((domain, index) => (
+        {domains?.map((domain, index) => (
           <MapItem key={domain.id} domain={domain} index={index} />
         ))}
       </motion.div>
@@ -96,10 +97,10 @@ const MapItem = ({
         />
         {domain?.favicon ? (
           <Image
-            src={domain.favicon || "/placeholder.svg"}
+            src={domain.favicon || Placeholder}
             alt={domain.domain}
             fill
-            className="object-cover"
+            className="object-cover rounded-full"
           />
         ) : (
           <div className="flex items-center justify-center h-full w-full bg-primary text-white text-xl font-bold">

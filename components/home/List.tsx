@@ -60,7 +60,7 @@ export const List: FC<ListProps> = ({ title, items, info, classNames }) => {
         initial="hidden"
         animate="visible"
       >
-        {items.map((item, index) => (
+        {items?.map((item, index) => (
           <ListItem key={item.id} {...item} order={index + 1} />
         ))}
       </motion.div>
@@ -98,7 +98,15 @@ const ListItem = ({
         <p className="text-white text-opacity-60 text-3xl">{order}.</p>
         <div className="flex items-center gap-x-2">
           {favicon ? (
-            <Image alt="" src={favicon} />
+            <div className="w-8 h-8 relative">
+              <Image
+                alt=""
+                src={favicon}
+                fill
+                className="rounded-full"
+                objectFit="cover"
+              />
+            </div>
           ) : (
             <div className="bg-primary w-8 h-8 rounded-full"></div>
           )}
