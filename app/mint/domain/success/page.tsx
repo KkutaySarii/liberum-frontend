@@ -32,8 +32,9 @@ const MintSuccessPage = () => {
           <p className="text-gray-300 mb-16 text-lg mt-8">
             You can customize your blockspace view. Set a favicon!
           </p>
-
-          <ImageUpload domain_id={selectedDomain?._id} />
+          <div className="flex items-center justify-center w-full mb-5">
+            <ImageUpload domain_id={selectedDomain?._id} size={200} />
+          </div>
 
           <p className="text-3xl font-semibold mb-12">{selectedDomain?.name}</p>
 

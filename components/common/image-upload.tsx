@@ -4,7 +4,13 @@ import { uploadToS3 } from "@/utils/s3";
 import Image from "next/image";
 import toast from "react-hot-toast";
 
-export const ImageUpload = ({ domain_id }: { domain_id: string }) => {
+export const ImageUpload = ({
+  domain_id,
+  size,
+}: {
+  domain_id: string;
+  size: number;
+}) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -40,10 +46,14 @@ export const ImageUpload = ({ domain_id }: { domain_id: string }) => {
     }
   };
   return (
-    <div className="flex items-center justify-center w-full mb-5">
+    <>
       <button
         onClick={() => document.getElementById("image-upload-mint")?.click()}
-        className="bg-primary relative hover:bg-primary/90 w-[200px] h-[200px] rounded-full flex items-center justify-center overflow-hidden transition-all duration-300"
+        className={`bg-primary relative hover:bg-primary/90 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 `}
+        style={{
+          width: size,
+          height: size,
+        }}
       >
         {!imageUrl &&
           (!isUploading ? (
@@ -60,6 +70,6 @@ export const ImageUpload = ({ domain_id }: { domain_id: string }) => {
         className="hidden"
         onChange={handleUpload}
       />
-    </div>
+    </>
   );
 };
