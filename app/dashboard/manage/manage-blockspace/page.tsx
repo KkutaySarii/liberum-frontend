@@ -136,7 +136,7 @@ const ManageBlockspacePage = () => {
               <h2 className="text-2xl text-white mb-4">Expiry</h2>
                 <p className="text-gray-400">{expiry}</p>
                 </div>
-                <button className="px-2 py-1 font-semibold text-xs bg-secondary text-black rounded hover:bg-opacity-90 transition-colors" onClick={() => router.push(`/mint/${selectedDomain?.name}`)}>
+                <button className="px-2 py-1 font-semibold text-xs bg-secondary text-black rounded hover:bg-opacity-90 transition-colors" onClick={() => router.push(`/mint/domain?type=extend`)}>
                   Extend
                 </button>
          

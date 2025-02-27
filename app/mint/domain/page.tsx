@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import NavbarMint from '@/components/NavbarMint'
 import { useSelector } from 'react-redux'
 import { useMetaMask } from '@/hooks/useMetaMask'
@@ -10,8 +10,11 @@ import type { RootState } from '@/store/store'
 import { storage, StorageKeys } from '@/utils/storage'
 
 const MintDomainPage = () => {
+  const searchParams = useSearchParams()
+  const type = searchParams.get('type')
   const router = useRouter()
   const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
+  const [tokenId, setTokenId] = useState<string | null>(null)
 
   const [years, setYears] = useState(1)
   const [prices, setPrices] = useState({
@@ -31,6 +34,23 @@ const MintDomainPage = () => {
   const handleDecrement = () => {
     if (years > 1) setYears(prev => prev - 1)
   }
+  useEffect(() => {
+    const fetchTokenId = async () => {
+      console.log({contract});
+      console.log({provider});
+      if (!contract || !provider) return;
+      
+      try {
+        console.log('girdi')
+        const tokenId = await contract.getTokenIdByDomain(selectedDomain?.name)
+        setTokenId(tokenId)
+      } catch (err) {
+        console.error('Error fetching prices:', err)
+      }
+    } 
+    fetchTokenId() 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract])
 
 
   useEffect(() => {
@@ -80,6 +100,15 @@ const MintDomainPage = () => {
   }
 
   const handleMint = async () => {
+    if (type === 'extend') {
+      await handleExtend()
+    } else {
+      await handleFirstMint()
+    }
+  }
+
+  
+const handleFirstMint = async () => {
     try {
       if (!selectedDomain?.name) {
         throw new Error('Domain name is required');
@@ -99,7 +128,28 @@ const MintDomainPage = () => {
     } catch (err) {
       console.error('Mint error:', err);
     }
-  };
+    };
+
+    const handleExtend = async () => {
+      try {
+        if (!tokenId) {
+          throw new Error('Token ID is required');
+        }
+  
+        const yearsInSeconds = yearsToSeconds(years);
+        
+        const tx = await callContractMethod(
+          'renew',
+       tokenId,
+       yearsInSeconds,
+        );
+        
+        console.log('Mint transaction:', tx);
+        router.push(`/mint/domain/success`);
+      } catch (err) {
+        console.error('Mint error:', err);
+      }
+    }
 
   return (
     <div className='w-full h-screen bg-dark overflow-hidden'>

@@ -19,7 +19,6 @@ const UploadHtmlPage = () => {
   const [fileSize, setFileSize] = useState<number>(0)
   const [progress, setProgress] = useState<number>(0)
   const [uploading, setUploading] = useState<boolean>(false)
-  const [pageAddress, setPageAddress] = useState<string>("")
   const [prices, setPrices] = useState({
     network: "0",
     total: "0"
@@ -130,42 +129,26 @@ const UploadHtmlPage = () => {
      console.log({receipt})
      const iface = new Interface(htmlContractABI);
 
-// Receipt içindeki tüm log'ları döngü ile kontrol edip, decode ediyoruz
 receipt?.logs.forEach((log) => {
   try {
     const parsedLog = iface.parseLog(log);
     console.log("Event Name:", parsedLog?.name);
     console.log("User:", parsedLog?.args.user);
     console.log("Page Contract:", parsedLog?.args.pageContract);
+    
+    if (parsedLog?.args.pageContract) {
+      const contractAddress = parsedLog.args.pageContract;
+      if (selectedDomain) {
+        router.push(`/mint/domain/content?address=${contractAddress}`);
+      } else {
+        router.push(`/mint/content?address=${contractAddress}`);
+      }
+    }
   } catch (error) {
-   console.log(error)
+    console.log(error);
   }
 });
-     
-      if (receipt) {
 
-        
-        const pageCreatedEvent = receipt.logs.find(log => 
-          log.topics[0] === contract?.interface.getEvent('PageCreated')?.format()
-        )
-
-        if (pageCreatedEvent) {
-          const parsedLog = contract?.interface.parseLog(pageCreatedEvent)
-          const pageAddress = parsedLog?.args[0]
-          console.log('Page Address:', pageAddress)
-          setPageAddress(pageAddress)
-        }
-        if (selectedDomain) {
-          if(pageAddress){
-            router.push(`/mint/domain/content?address=${pageAddress}`)
-          }else{
-            router.push(`/mint/domain/content`)
-          }
-        }
-        else {
-          router.push(`/`) //keremmmm
-        }
-      }
     } catch (err) {
       console.error('Upload error:', err)
     }
