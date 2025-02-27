@@ -26,6 +26,11 @@ const MintPage = () => {
   const [searchResults, setSearchResults] = useState<SearchResults[]>([]);
   const displayedResults = showAllDomains ? searchResults : searchResults.slice(0, 3);
 
+  useEffect(() => {
+  console.log('searchResults', searchResults)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchResults])
+
   const router = useRouter()
 
   useEffect(() => {
@@ -179,7 +184,7 @@ const MintPage = () => {
                 }}
               >
                 <div className="w-12 h-12 rounded-full"></div>
-                {domain.linkedContractAddress === "" ? (
+                {domain.linkedContractAddress === "" || !domain.linkedContractAddress ? (
                   <button 
                     className="text-xl hover:text-primary transition-colors"
                     onClick={() => {
@@ -191,9 +196,9 @@ const MintPage = () => {
                 ) : (
                   <span className="text-xl">{domain.name}</span>
                 )}
-                <span className={`${domain.linkedContractAddress === "" ? 'bg-green-500' : 'bg-blue-500'} px-3 py-1 rounded-full text-sm ml-auto`}>
-                {domain.linkedContractAddress === "" ? 'Available' : 'Registered'}
-                </span>
+                <span className={`${domain.linkedContractAddress === "" || !domain.linkedContractAddress ? 'bg-green-500' : 'bg-blue-500'} px-3 py-1 rounded-full text-sm ml-auto`}>
+                      {domain.linkedContractAddress === "" || !domain.linkedContractAddress ? 'Available' : 'Registered'}
+                      </span>
               </div>
             ))}
             

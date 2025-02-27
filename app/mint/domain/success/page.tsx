@@ -79,7 +79,7 @@ const MintSuccessPage = () => {
 
           <div className="flex justify-center gap-6">
             <Link 
-              href={`/mint/domain/upload/upload-html`} 
+              href={`/mint/domain/upload`} 
               className="px-6 py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors flex justify-items-center gap-2"
             >
                 <p className='font-normal'> Next Step:</p>

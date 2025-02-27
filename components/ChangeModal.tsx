@@ -4,6 +4,7 @@ import React from 'react'
 import { SearchResults, Content } from '@/types/walletAccount'
 import Image from 'next/image'
 import Union from '@/assets/Union (1).svg'
+import StrokeUnion from '@/assets/StrokeUnion.svg'
 import { storage, StorageKeys } from '@/utils/storage'
 interface ChangeModalProps {
   isOpen: boolean
@@ -119,13 +120,22 @@ const ChangeModal = ({ isOpen, onClose, type }: ChangeModalProps) => {
                     <div className="w-10 h-10 bg-primary rounded-full transition-all group-hover:border-2 group-hover:border-white"></div>
                   // )
                 ) : (
+                  <>
                   <Image 
                     src={Union} 
                     alt="Union" 
                     width={40} 
                     height={40} 
-                    className="rounded-full transition-all group-hover:border-2 group-hover:border-white" 
+                    className="rounded-full transition-all block group-hover:hidden" 
                   />
+                  <Image 
+                    src={StrokeUnion} 
+                    alt="Union" 
+                    width={40} 
+                    height={40} 
+                    className="rounded-full transition-all hidden group-hover:block" 
+                  />
+                  </>
                 )}
                 <span className="text-white">{item.name}</span>
               </div>

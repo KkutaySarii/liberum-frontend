@@ -10,7 +10,8 @@ import LoadingIcon from "@/assets/loading.svg"
 import CloseIcon from "@/assets/close.svg"
 import Union from "@/assets/Union (1).svg"
 import { useHtmlContract } from '@/hooks/useHtmlContract'
-import { ethers } from 'ethers'
+import { htmlContractABI } from '@/contracts/html-page-factory/abi'
+import { ethers, Interface } from 'ethers'
 import { storage, StorageKeys } from '@/utils/storage'
 const UploadHtmlPage = () => {
   const [fileEnter, setFileEnter] = useState(false)
@@ -18,6 +19,7 @@ const UploadHtmlPage = () => {
   const [fileSize, setFileSize] = useState<number>(0)
   const [progress, setProgress] = useState<number>(0)
   const [uploading, setUploading] = useState<boolean>(false)
+  const [pageAddress, setPageAddress] = useState<string>("")
   const [prices, setPrices] = useState({
     network: "0",
     total: "0"
@@ -100,11 +102,11 @@ const UploadHtmlPage = () => {
 
   const handleUpload = async () => {
     try {
-      if (!selectedDomain) {
-        throw new Error('Domain name is required')
-      }
       if (!htmlContent) {
         throw new Error('HTML content is required')
+      }
+      if (!fileName) {
+        throw new Error('File name is required')
       }
 
       const tx = await callContractMethod(
@@ -123,10 +125,26 @@ const UploadHtmlPage = () => {
         owner: '',
         contractAddress: ''
        })
-
+      console.log({tx})
       const receipt = await provider?.waitForTransaction(tx.hash)
+     console.log({receipt})
+     const iface = new Interface(htmlContractABI);
 
+// Receipt içindeki tüm log'ları döngü ile kontrol edip, decode ediyoruz
+receipt?.logs.forEach((log) => {
+  try {
+    const parsedLog = iface.parseLog(log);
+    console.log("Event Name:", parsedLog?.name);
+    console.log("User:", parsedLog?.args.user);
+    console.log("Page Contract:", parsedLog?.args.pageContract);
+  } catch (error) {
+   console.log(error)
+  }
+});
+     
       if (receipt) {
+
+        
         const pageCreatedEvent = receipt.logs.find(log => 
           log.topics[0] === contract?.interface.getEvent('PageCreated')?.format()
         )
@@ -135,17 +153,17 @@ const UploadHtmlPage = () => {
           const parsedLog = contract?.interface.parseLog(pageCreatedEvent)
           const pageAddress = parsedLog?.args[0]
           console.log('Page Address:', pageAddress)
-          
-          if (selectedDomain) {
-            if(pageAddress){
-              router.push(`/mint/domain/content?address=${pageAddress}`)
-            }else{
-              router.push(`/mint/domain/content`)
-            }
+          setPageAddress(pageAddress)
+        }
+        if (selectedDomain) {
+          if(pageAddress){
+            router.push(`/mint/domain/content?address=${pageAddress}`)
+          }else{
+            router.push(`/mint/domain/content`)
           }
-          else {
-            router.push(`/dashboard/manage/select-blockspace`)  //kereme sor
-          }
+        }
+        else {
+          router.push(`/`) //keremmmm
         }
       }
     } catch (err) {

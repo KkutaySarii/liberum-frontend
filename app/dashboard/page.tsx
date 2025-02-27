@@ -95,7 +95,7 @@ const DashboardPage = () => {
     if(type === "blockspace"){
       router.push(`/mint/`)
     }else{
-      router.push(`/mint/domain/upload`)
+      router.push(`/mint/domain/upload/upload-html`)
     }
   }
 

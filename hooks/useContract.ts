@@ -1,5 +1,5 @@
 import {ethers, BrowserProvider, Contract } from 'ethers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { domainContractABI , domainContractAddress} from '@/contracts/domain-contract/abi';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -13,6 +13,13 @@ export const useContract = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   
   const account = useSelector((state: RootState) => state.wallet.account);
+
+  useEffect(() => {
+    if (account) {
+      connectToContract();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account]);
 
   const connectToContract = async () => {
     if (isConnecting || !account) return;

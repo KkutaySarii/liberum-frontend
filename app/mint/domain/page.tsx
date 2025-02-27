@@ -43,7 +43,7 @@ const MintDomainPage = () => {
       try {
         console.log('girdi')
         const yearsInSeconds = yearsToSeconds(years);
-        const estimateGas = await contract.mintDomain.estimateGas(selectedDomain, yearsInSeconds)
+        const estimateGas = await contract.mintDomain.estimateGas(selectedDomain?.name, yearsInSeconds)
 
         const networkFee = await provider.getFeeData()
         if (!networkFee?.gasPrice) return;
