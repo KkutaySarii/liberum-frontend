@@ -145,7 +145,11 @@ const ManageBlockspacePage = () => {
                         className="rounded-full"
                       /> */}
 
-                    <span className="text-white text-lg">{linkedContent}</span>
+                    <span className="text-white text-lg">
+                      {linkedContent.slice(0, 10) +
+                        "..." +
+                        linkedContent.slice(-8)}
+                    </span>
                   </div>
                   <button
                     disabled={isLoading}
