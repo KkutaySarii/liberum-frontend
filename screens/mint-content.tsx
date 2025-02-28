@@ -40,8 +40,10 @@ const ContentPage = () => {
             Your content has been successfully uploaded to blockchain
           </p>
 
-          <div className="relative w-36 h-36 mx-auto mb-8 cursor-pointer group">
-            <Image src={Union} alt="icon" width={144} height={144} />
+          <div className="w-full flex items-center justify-center">
+            <div className="relative w-36 h-36 mb-8 cursor-pointer group">
+              <Image src={Union} alt="icon" width={144} height={144} />
+            </div>
           </div>
 
           <p className="text-3xl font-semibold mb-2 underline">

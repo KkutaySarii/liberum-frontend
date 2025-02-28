@@ -24,7 +24,7 @@ const LinkPage = () => {
   const searchParams = useSearchParams();
   const [pageAddress, setPageAddress] = useState<string | null>(null);
   const [tokenId, setTokenId] = useState<string | null>(null);
-  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain ;
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain;
   const selectedFile = storage.get(StorageKeys.SELECTED_FILE) as ContentData;
   const { contract, provider } = useContract();
   const {
@@ -33,34 +33,28 @@ const LinkPage = () => {
     provider: htmlProvider,
   } = useHtmlContract();
   const account = useSelector((state: RootState) => state.wallet.account);
-const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [prices, setPrices] = useState({
     network: "0",
     total: "0",
   });
+
   useEffect(() => {
-   console.log("selectedDomain", selectedDomain)
-   console.log("selectedFile", selectedFile)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => {
-    if (!searchParams ) {
-      setPageAddress(selectedFile.pageContract)
+    if (!searchParams.has("address")) {
+      setPageAddress(selectedFile.pageContract);
     } else {
       setPageAddress(searchParams.get("address"));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
+  console.log({ contract }, provider);
 
   useEffect(() => {
     const fetchTokenId = async () => {
-      console.log({ contract });
-      console.log({ provider });
       if (!contract || !provider) return;
 
       try {
-        console.log("girdi");
         const tokenId = await contract.getTokenIdByDomain(selectedDomain?.name);
         setTokenId(tokenId);
       } catch (err) {
@@ -121,15 +115,13 @@ const [isLoading, setIsLoading] = useState(false);
         pageAddress,
         tokenId
       );
-      console.log({ tx });
-      if(tx){
+      if (tx) {
         toast.success("Linked successfully", { position: "top-right" });
       }
-      console.log("Upload transaction:", tx);
       router.push(`/mint/domain/content/success`);
     } catch (err) {
       console.error("Upload error:", err);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -150,7 +142,7 @@ const [isLoading, setIsLoading] = useState(false);
 
           <div className="flex items-center justify-between mb-12">
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 bg-primary rounded-full"></div>
+              <div className="w-10 h-10 bg-primary rounded-full"></div>
               <span className="text-2xl">{selectedDomain?.name}</span>
             </div>
           </div>
