@@ -9,7 +9,7 @@ import { ContentData } from '@/types/walletAccount'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 import { useHtmlContract } from '@/hooks/useHtmlContract'
-
+import toast from 'react-hot-toast'
 
 const ManageContentPage = () => {
 
@@ -20,7 +20,7 @@ const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
   const { callContractMethod } = useHtmlContract()
   const owner =  account
   const contractAddress = selectedFile?.pageContract ? selectedFile?.pageContract : ""
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const formatAddress = (address: string) => {
     return address?.slice(0, 10) + "..." + address?.slice(-8)
   }
@@ -34,7 +34,7 @@ const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
 
 
   const handleUnlinkDomain =  async () => {
-    console.log("girdi")
+    setIsLoading(true);
     try {
       if (!selectedFile?.pageContract || !selectedFile?.tokenId) {
         throw new Error("Page Contract is required");
@@ -47,6 +47,9 @@ const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
       );
 
       console.log("Mint transaction:", tx);
+      if(tx){
+        toast.success("Domain unlinked successfully", { position: "top-right" });
+      }
     const newSelectedFile = {
       ...selectedFile,
       domain: "",
@@ -58,6 +61,8 @@ const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
 
     } catch (error) {
       console.error("Error unlinking domain:", error);
+    }finally{
+      setIsLoading(false);
     }
   };
   // useEffect(() => {
@@ -112,7 +117,7 @@ const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
                     className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
                     onClick={handleUnlinkDomain}
                   >
-                    Unlink
+                    {isLoading ? "Unlinking..." : "Unlink"}
                   </button>
                 </div>
               </div>

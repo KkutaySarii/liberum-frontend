@@ -12,6 +12,7 @@ import { useHtmlContract } from '@/hooks/useHtmlContract'
 import { htmlContractABI } from '@/contracts/html-page-factory/abi'
 import { ethers, Interface } from 'ethers'
 import { storage, StorageKeys } from '@/utils/storage'
+import toast from 'react-hot-toast'
 const UploadHtmlPage = () => {
   const [fileEnter, setFileEnter] = useState(false)
   const [fileName, setFileName] = useState<string>("")
@@ -22,6 +23,7 @@ const UploadHtmlPage = () => {
     network: "0",
     total: "0"
   })
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter()
   const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
   const { contract, callContractMethod, provider } = useHtmlContract()
@@ -99,6 +101,7 @@ const UploadHtmlPage = () => {
   }
 
   const handleUpload = async () => {
+    setIsLoading(true);
     try {
       if (!htmlContent) {
         throw new Error('HTML content is required')
@@ -123,6 +126,9 @@ const UploadHtmlPage = () => {
         contractAddress: ''
        })
       console.log({tx})
+      if(tx){
+        toast.success("Content uploaded successfully", { position: "top-right" });
+      }
       const receipt = await provider?.waitForTransaction(tx.hash)
      console.log({receipt})
      const iface = new Interface(htmlContractABI);
@@ -149,6 +155,8 @@ receipt?.logs.forEach((log) => {
 
     } catch (err) {
       console.error('Upload error:', err)
+    }finally{
+      setIsLoading(false);
     }
   }
 
@@ -263,11 +271,11 @@ receipt?.logs.forEach((log) => {
                                     </div>
                                  <div className='w-full flex justify-center items-center'>
                                     <button 
-                                      disabled={!htmlContent || !fileName || progress < 100}
+                                      disabled={!htmlContent || !fileName || progress < 100  || isLoading}
                                       onClick={handleButtonClick}
-                                      className="w-1/2 bg-secondary hover:bg-secondary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      className="w-1/2 bg-secondary hover:bg-secondary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 "
                                     >
-                                    Deploy
+                                    {isLoading ? "Deploying..." : "Deploy"}
                                     </button>
                                     </div> 
                                   </div>

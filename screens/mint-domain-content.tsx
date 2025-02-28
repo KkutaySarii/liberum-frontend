@@ -11,6 +11,8 @@ import { useHtmlContract } from "@/hooks/useHtmlContract";
 import { ethers } from "ethers";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { ContentData, Domain } from "@/types/walletAccount";
+import toast from "react-hot-toast";
 
 const formatAddress = (address: string | null) => {
   if (!address) return "";
@@ -22,8 +24,8 @@ const LinkPage = () => {
   const searchParams = useSearchParams();
   const [pageAddress, setPageAddress] = useState<string | null>(null);
   const [tokenId, setTokenId] = useState<string | null>(null);
-  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN);
-  const selectedFile = storage.get(StorageKeys.SELECTED_FILE);
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain ;
+  const selectedFile = storage.get(StorageKeys.SELECTED_FILE) as ContentData;
   const { contract, provider } = useContract();
   const {
     contract: htmlContract,
@@ -31,17 +33,25 @@ const LinkPage = () => {
     provider: htmlProvider,
   } = useHtmlContract();
   const account = useSelector((state: RootState) => state.wallet.account);
-
+const [isLoading, setIsLoading] = useState(false);
   const [prices, setPrices] = useState({
     network: "0",
     total: "0",
   });
   useEffect(() => {
-    if (!searchParams) {
-      return;
+   console.log("selectedDomain", selectedDomain)
+   console.log("selectedFile", selectedFile)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (!searchParams ) {
+      setPageAddress(selectedFile.pageContract)
+    } else {
+      setPageAddress(searchParams.get("address"));
     }
-    setPageAddress(searchParams.get("address"));
-  }, [searchParams]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   useEffect(() => {
     const fetchTokenId = async () => {
@@ -97,6 +107,7 @@ const LinkPage = () => {
   }, [htmlContract, pageAddress, tokenId]);
 
   const handleLink = async () => {
+    setIsLoading(true);
     try {
       if (!pageAddress) {
         throw new Error("Contract address is required");
@@ -111,10 +122,15 @@ const LinkPage = () => {
         tokenId
       );
       console.log({ tx });
+      if(tx){
+        toast.success("Linked successfully", { position: "top-right" });
+      }
       console.log("Upload transaction:", tx);
       router.push(`/mint/domain/content/success`);
     } catch (err) {
       console.error("Upload error:", err);
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -172,13 +188,13 @@ const LinkPage = () => {
           </div>
           <div className="flex justify-center gap-8 max-w-xl mx-auto">
             <button
-              disabled={!account}
-              className="w-full py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors text-center disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!account || isLoading}
+              className="w-full py-3 bg-secondary rounded-lg font-semibold text-black hover:bg-opacity-90 transition-colors text-center disabled:opacity-50 "
               onClick={() => {
                 handleLink();
               }}
             >
-              Link
+              {isLoading ? "Linking..." : "Link"}
             </button>
             <button
               onClick={handleDoItLater}

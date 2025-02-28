@@ -23,10 +23,11 @@ const MintDomainPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!searchParams) {
-      return;
+    if (!searchParams) return;
+    const typeParam = searchParams.get("type");
+    if (typeParam) {
+      setType(typeParam);
     }
-    setType(searchParams.get("type"));
   }, [searchParams]);
 
   const [years, setYears] = useState(1);
@@ -36,7 +37,7 @@ const MintDomainPage = () => {
     total: "0",
   });
 
-  const { connect, isConnecting } = useMetaMask();
+  const {  isConnecting } = useMetaMask();
   const { contract, callContractMethod, provider } = useContract();
   const account = useSelector((state: RootState) => state.wallet.account);
 
@@ -47,6 +48,7 @@ const MintDomainPage = () => {
   const handleDecrement = () => {
     if (years > 1) setYears((prev) => prev - 1);
   };
+  
 
   useEffect(() => {
     const fetchTokenId = async () => {
@@ -58,6 +60,7 @@ const MintDomainPage = () => {
         console.log("girdi");
         const tokenId = await contract.getTokenIdByDomain(selectedDomain?.name);
         setTokenId(tokenId);
+        console.log("tokenId",tokenId)
       } catch (err) {
         console.error("Error fetching prices:", err);
       }
@@ -70,16 +73,24 @@ const MintDomainPage = () => {
     const fetchPrices = async () => {
       console.log({ contract });
       console.log({ provider });
-      if (!contract || !provider) return;
+      if (!contract || !provider || !tokenId) return;
 
       try {
-        console.log("girdi");
-        const yearsInSeconds = yearsToSeconds(years);
-        const estimateGas = await contract.mintDomain.estimateGas(
-          selectedDomain?.name,
-          yearsInSeconds
-        );
 
+        const yearsInSeconds = yearsToSeconds(years);
+        let estimateGas;
+        if (type === "extend") {
+          estimateGas = await contract.renew.estimateGas(
+            tokenId,
+            yearsInSeconds
+          );
+        }
+        else {
+          estimateGas = await contract.mintDomain.estimateGas(
+            selectedDomain?.name,
+            yearsInSeconds
+          );
+        }
         const networkFee = await provider.getFeeData();
         if (!networkFee?.gasPrice) return;
 
@@ -100,19 +111,12 @@ const MintDomainPage = () => {
 
     fetchPrices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract, years]);
+  }, [contract, years, type, tokenId]);
 
   const yearsToSeconds = (years: number) => {
     return years * 365 * 24 * 60 * 60;
   };
 
-  const handleButtonClick = async () => {
-    if (!account) {
-      await connect();
-    } else {
-      await handleMint();
-    }
-  };
 
   const handleMint = async () => {
     if (type === "extend") {
@@ -123,6 +127,7 @@ const MintDomainPage = () => {
   };
 
   const handleFirstMint = async () => {
+    console.log("first mint")
     setIsLoading(true);
     try {
       if (!selectedDomain?.name) {
@@ -139,6 +144,10 @@ const MintDomainPage = () => {
       );
 
       console.log("Mint transaction:", tx);
+
+      if(tx){
+        toast.success("Domain minted successfully", { position: "top-right" });
+      }
 
       const receipt = await provider?.waitForTransaction(tx.hash);
       console.log("Mint receipt:", receipt);
@@ -202,6 +211,7 @@ const MintDomainPage = () => {
   };
 
   const handleExtend = async () => {
+    console.log("extend")
     try {
       if (!tokenId) {
         throw new Error("Token ID is required");
@@ -210,6 +220,10 @@ const MintDomainPage = () => {
       const yearsInSeconds = yearsToSeconds(years);
 
       const tx = await callContractMethod("renew", tokenId, yearsInSeconds);
+
+      if(tx){
+        toast.success("Domain extended successfully", { position: "top-right" });
+      }
 
       console.log("Mint transaction:", tx);
       router.push(`/mint/domain/success`);
@@ -242,9 +256,9 @@ const MintDomainPage = () => {
               -
             </button>
             <div className="text-center">
-              <div className="text-6xl font-bold mb-2">
+              <span className="text-5xl font-bold mb-2">
                 {years} Year{years > 1 ? "s" : ""}
-              </div>
+              </span>
             </div>
             <button
               onClick={handleIncrement}
@@ -272,7 +286,7 @@ const MintDomainPage = () => {
             </div>
             <div className="w-full flex justify-center items-center">
               <button
-                onClick={handleButtonClick}
+                onClick={handleMint}
                 disabled={isConnecting || isLoading}
                 className="w-1/2 bg-secondary hover:bg-secondary/90 text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
               >
@@ -280,7 +294,7 @@ const MintDomainPage = () => {
                   ? "Connecting..."
                   : account
                   ? !isLoading
-                    ? "Mint"
+                    ? type==="extend"?"Extend":"Mint"
                     : "Minting..."
                   : "Connect Wallet"}
               </button>

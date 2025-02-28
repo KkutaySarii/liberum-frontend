@@ -159,133 +159,133 @@ const DashboardPage = () => {
             Your Dashboard
           </h1>
 
-
-          <div className="tab-pagination flex space-x-8 mb-8 border-b border-gray-800 max-w-xl ">
-            <button
-              className={`text-xl font-medium px-4 pb-2 w-full ${
-                activeTab === "blockspace"
-                  ? "text-[#F5A051] border-b-2 border-[#F5A051]"
-                  : "text-gray-500"
-              }`}
-              onClick={() => setActiveTab("blockspace")}
-            >
-              Blockspace
-            </button>
-            <button
-              className={`text-xl font-medium px-4 pb-2 w-full ${
-                activeTab === "content"
-                  ? "text-[#F5A051] border-b-2 border-[#F5A051]"
-                  : "text-gray-500"
-              }`}
-              onClick={() => setActiveTab("content")}
-            >
-              Content
-            </button>
-          </div>
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : (
             <>
-          <div className="relative max-w-2xl mx-auto overflow-hidden">
-            <Swiper
-              slidesPerView={1}
-              modules={[Pagination]}
-              onSlideChange={(swiper) =>
-                setActiveTab(
-                  swiper.activeIndex === 0 ? "blockspace" : "content"
-                )
-              }
-              onSwiper={(swiper) => {
-                document
-                  .querySelectorAll(".tab-pagination button")
-                  .forEach((button, index) => {
-                    button.addEventListener("click", () => {
-                      swiper.slideTo(index);
-                    });
-                  });
-              }}
-            >
-              <SwiperSlide>
-                <div className="space-y-4 max-w-2xl max-h-[45vh] overflow-y-auto noscrollbar">
-                  {blockspaceData.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between  py-4 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        {/* {item.image ? (
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            width={40}
-                            height={40}
-                            className="rounded-full"
-                          />
-                        ) : ( */}
-                        <div className="w-10 h-10 bg-primary rounded-full transition-all"></div>
-                        {/* )} */}
-                        <span className="text-white text-lg">{item.name}</span>
-                      </div>
-                      <button
-                        className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
-                        onClick={() => handleManageBlockspace(item)}
-                      >
-                        Manage
-                      </button>
+              <div className="tab-pagination flex space-x-8 mb-8 border-b border-gray-800 max-w-xl">
+                <button
+                  className={`text-xl font-medium px-4 pb-2 w-full ${
+                    activeTab === "blockspace"
+                      ? "text-[#F5A051] border-b-2 border-[#F5A051]"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("blockspace")}
+                >
+                  Blockspace
+                </button>
+                <button
+                  className={`text-xl font-medium px-4 pb-2 w-full ${
+                    activeTab === "content"
+                      ? "text-[#F5A051] border-b-2 border-[#F5A051]"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("content")}
+                >
+                  Content
+                </button>
+              </div>
+
+              <div className="relative max-w-2xl mx-auto overflow-hidden">
+                <Swiper
+                  slidesPerView={1}
+                  modules={[Pagination]}
+                  onSlideChange={(swiper) =>
+                    setActiveTab(
+                      swiper.activeIndex === 0 ? "blockspace" : "content"
+                    )
+                  }
+                  onSwiper={(swiper) => {
+                    document
+                      .querySelectorAll(".tab-pagination button")
+                      .forEach((button, index) => {
+                        button.addEventListener("click", () => {
+                          swiper.slideTo(index);
+                        });
+                      });
+                  }}
+                >
+                  <SwiperSlide>
+                    <div className="space-y-4 max-w-2xl max-h-[45vh] overflow-y-auto noscrollbar">
+                      {blockspaceData.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between  py-4 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            {/* {item.image ? (
+                              <Image
+                                src={item.image}
+                                alt={item.name}
+                                width={40}
+                                height={40}
+                                className="rounded-full"
+                              />
+                            ) : ( */}
+                            <div className="w-10 h-10 bg-primary rounded-full transition-all"></div>
+                            {/* )} */}
+                            <span className="text-white text-lg">{item.name}</span>
+                          </div>
+                          <button
+                            className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
+                            onClick={() => handleManageBlockspace(item)}
+                          >
+                            Manage
+                          </button>
+                        </div>
+                      ))}
+
                     </div>
-                  ))}
-
-                </div>
-                <div className="w-full items-center flex justify-center my-10">
-                    <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
-                      <span
-                        className="text-black text-3xl"
-                        onClick={() => handleAdd("blockspace")}
-                      >
-                        +
-                      </span>
-                    </button>
-                  </div>
-              </SwiperSlide>
-
-              <SwiperSlide>
-                <div className="space-y-4 max-h-[45vh] overflow-y-auto noscrollbar">
-                  {contentData.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between  py-4 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={Union}
-                          alt={item.name}
-                          width={40}
-                          height={40}
-                          className="rounded-full"
-                        />
-                        <span className="text-white text-lg">{item.name}</span>
+                    <div className="w-full items-center flex justify-center my-10">
+                        <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
+                          <span
+                            className="text-black text-3xl"
+                            onClick={() => handleAdd("blockspace")}
+                          >
+                            +
+                          </span>
+                        </button>
                       </div>
-                      <button
-                        className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
-                        onClick={() => handleManageContent(item)}
-                      >
-                        Manage
-                      </button>
-                    </div>
-                  ))}
+                  </SwiperSlide>
 
-            
-                </div>
-                <div className="w-full items-center flex justify-center my-10">
-                    <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
-                      <span
-                        className="text-black text-3xl"
-                        onClick={() => handleAdd("content")}
-                      >
-                        +
-                      </span>
-                    </button>
-                  </div>
-              </SwiperSlide>
-            </Swiper>
-          </div>
-          </>
+                  <SwiperSlide>
+                    <div className="space-y-4 max-h-[45vh] overflow-y-auto noscrollbar">
+                      {contentData.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between  py-4 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Image
+                              src={Union}
+                              alt={item.name}
+                              width={40}
+                              height={40}
+                              className="rounded-full"
+                            />
+                            <span className="text-white text-lg">{item.name}</span>
+                          </div>
+                          <button
+                            className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
+                            onClick={() => handleManageContent(item)}
+                          >
+                            Manage
+                          </button>
+                        </div>
+                      ))}
+
+                  
+                    </div>
+                    <div className="w-full items-center flex justify-center my-10">
+                        <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
+                          <span
+                            className="text-black text-3xl"
+                            onClick={() => handleAdd("content")}
+                          >
+                            +
+                          </span>
+                        </button>
+                      </div>
+                  </SwiperSlide>
+                </Swiper>
+              </div>
+            </>
           )}
         </div>
       </main>

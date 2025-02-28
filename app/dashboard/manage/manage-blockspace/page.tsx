@@ -12,20 +12,18 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useHtmlContract } from "@/hooks/useHtmlContract";
 import { useHtmlPageContract } from "@/hooks/useHtmlPage";
-
+import toast from "react-hot-toast";
 const ManageBlockspacePage = () => {
   const router = useRouter();
-  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
-  const [linkedContent, setLinkedContent] = useState<string | null>(null);
-  const { callContractMethod } = useHtmlContract();
-  const { contract: htmlPageContract, provider: htmlPageProvider } =
-    useHtmlPageContract(
-      selectedDomain?.pageContract ? selectedDomain?.pageContract : ""
-    );
 
-  const account = useSelector((state: RootState) => state.wallet.account);
-  const owner = account;
-  const expiry = selectedDomain?.expiration_date;
+  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null)
+  const [linkedContent, setLinkedContent] = useState<string | null>(null)
+  const { callContractMethod } = useHtmlContract()
+  const { contract: htmlPageContract,provider: htmlPageProvider } = useHtmlPageContract(selectedDomain?.pageContract ? selectedDomain?.pageContract : "")
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const account = useSelector((state: RootState) => state.wallet.account)
+  const owner = account
+  const expiry = selectedDomain?.expiration_date  
 
   useEffect(() => {
     const selectedDomainStore = storage.get(
@@ -60,6 +58,7 @@ const ManageBlockspacePage = () => {
   console.log(linkedContent);
 
   const handleUnlinkContent = async () => {
+    setIsLoading(true);
     try {
       console.log("girdi");
       if (!selectedDomain?.pageContract) {
@@ -72,16 +71,24 @@ const ManageBlockspacePage = () => {
         selectedDomain?.tokenId
       );
 
-      console.log("Mint transaction:", tx);
-      const newSelectedDomain = {
-        ...selectedDomain,
-        pageContract: "",
-      } as Domain;
-      setSelectedDomain(newSelectedDomain);
-      storage.set(StorageKeys.SELECTED_DOMAIN, newSelectedDomain);
-      setLinkedContent(null);
+
+      if(tx){
+        toast.success("Unlinked successfully", { position: "top-right" });
+      }
+      console.log("Mint transaction:", tx); 
+        const newSelectedDomain = {
+          ...selectedDomain,
+          pageContract: "",
+        } as Domain;
+        setSelectedDomain(newSelectedDomain);
+        storage.set(StorageKeys.SELECTED_DOMAIN, newSelectedDomain);
+        setLinkedContent(null);
+    
+
     } catch (error) {
       console.error("Error unlinking domain:", error);
+    }finally{
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -134,10 +141,11 @@ const ManageBlockspacePage = () => {
                     <span className="text-white text-lg">{linkedContent}</span>
                   </div>
                   <button
+                    disabled={isLoading}
                     className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
                     onClick={handleUnlinkContent}
                   >
-                    Unlink
+                    {isLoading ? "Unlinking..." : "Unlink"}
                   </button>
                 </div>
               </div>
@@ -178,6 +186,7 @@ const ManageBlockspacePage = () => {
               >
                 Visit Site
               </button>
+
             )}
             {!linkedContent && (
               <Link
