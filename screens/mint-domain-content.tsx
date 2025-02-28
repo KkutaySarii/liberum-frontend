@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { ContentData, Domain } from "@/types/walletAccount";
 import toast from "react-hot-toast";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const formatAddress = (address: string | null) => {
   if (!address) return "";
@@ -135,6 +136,12 @@ const LinkPage = () => {
   return (
     <div className="w-full h-screen bg-dark overflow-hidden">
       <NavbarMint />
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
 
       <main className="container max-w-3xl mx-auto mt-12 pb-20">
         <div className="pt-32 text-start">

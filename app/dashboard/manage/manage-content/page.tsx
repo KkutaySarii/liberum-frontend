@@ -1,39 +1,43 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import NavbarMint from '@/components/NavbarMint'
-import Union from '@/assets/Union (1).svg'
-import { storage, StorageKeys } from '@/utils/storage'
-import { ContentData } from '@/types/walletAccount'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store/store'
-import { useHtmlContract } from '@/hooks/useHtmlContract'
-import toast from 'react-hot-toast'
+"use client";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import NavbarMint from "@/components/NavbarMint";
+import Union from "@/assets/Union (1).svg";
+import { storage, StorageKeys } from "@/utils/storage";
+import { ContentData } from "@/types/walletAccount";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { useHtmlContract } from "@/hooks/useHtmlContract";
+import toast from "react-hot-toast";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { useRouter } from "next/navigation";
 
 const ManageContentPage = () => {
+  const [selectedFile, setSelectedFile] = useState<ContentData | null>(null);
 
-const [selectedFile, setSelectedFile] = useState<ContentData | null>(null)
-
-const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
-  const account = useSelector((state: RootState) => state.wallet.account)
-  const { callContractMethod } = useHtmlContract()
-  const owner =  account
-  const contractAddress = selectedFile?.pageContract ? selectedFile?.pageContract : ""
+  const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null);
+  const account = useSelector((state: RootState) => state.wallet.account);
+  const { callContractMethod } = useHtmlContract();
+  const owner = account;
+  const contractAddress = selectedFile?.pageContract
+    ? selectedFile?.pageContract
+    : "";
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formatAddress = (address: string) => {
-    return address?.slice(0, 10) + "..." + address?.slice(-8)
-  }
+    return address?.slice(0, 10) + "..." + address?.slice(-8);
+  };
   useEffect(() => {
-    const selectedFileStore = storage.get(StorageKeys.SELECTED_FILE) as ContentData;
-    setSelectedFile(selectedFileStore)
+    const selectedFileStore = storage.get(
+      StorageKeys.SELECTED_FILE
+    ) as ContentData;
+    setSelectedFile(selectedFileStore);
     if (selectedFileStore?.domain) {
-      setLinkedBlockspace(selectedFileStore?.domain)
+      setLinkedBlockspace(selectedFileStore?.domain);
     }
-  }, [])
+  }, []);
 
-
-  const handleUnlinkDomain =  async () => {
+  const handleUnlinkDomain = async () => {
     setIsLoading(true);
     try {
       if (!selectedFile?.pageContract || !selectedFile?.tokenId) {
@@ -43,40 +47,40 @@ const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
       const tx = await callContractMethod(
         "unlinkDomain",
         selectedFile?.pageContract,
-        selectedFile?.tokenId,
+        selectedFile?.tokenId
       );
 
       console.log("Mint transaction:", tx);
-      if(tx){
-        toast.success("Domain unlinked successfully", { position: "top-right" });
+      if (tx) {
+        toast.success("Domain unlinked successfully", {
+          position: "top-right",
+        });
       }
-    const newSelectedFile = {
-      ...selectedFile,
-      domain: "",
-      tokenId: "",
-    } as ContentData;
-    setSelectedFile(newSelectedFile);
-    storage.set(StorageKeys.SELECTED_FILE, newSelectedFile);
-    setLinkedBlockspace(null);
-
+      const newSelectedFile = {
+        ...selectedFile,
+        domain: "",
+        tokenId: "",
+      } as ContentData;
+      setSelectedFile(newSelectedFile);
+      storage.set(StorageKeys.SELECTED_FILE, newSelectedFile);
+      setLinkedBlockspace(null);
     } catch (error) {
       console.error("Error unlinking domain:", error);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
-  // useEffect(() => {
-  //   if (linkedBlockspace) {
-  //     storage.set(StorageKeys.SELECTED_DOMAIN, linkedBlockspace)
-  //   }else{
-  //     storage.set(StorageKeys.SELECTED_DOMAIN, null)
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
+  const router = useRouter();
 
   return (
     <div className="w-full h-screen bg-dark overflow-hidden">
       <NavbarMint />
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
 
       <main className="container max-w-3xl mx-auto mt-12 pb-20">
         <div className="pt-32 text-start">

@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,12 +11,20 @@ import Vector2 from "@/assets/Vector2.svg";
 import GoogleIcon from "@/assets/Google Chrome.svg";
 import ExtensionIcon from "@/assets/Extension (1).svg";
 import NavbarInstall from "@/components/NavbarInstall";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { useRouter } from "next/navigation";
 
 const InstallPage = () => {
+  const router = useRouter();
   return (
-    <div className="w-full h-screen bg-dark ">
+    <div className="w-full h-screen bg-dark">
       <NavbarInstall />
-
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
       <main className="container max-w-4xl mx-auto mt-12 overflow-y-auto noscrollbar">
         <div className="pt-20 w-full justify-center items-center">
           <h1 className="text-4xl font-bold mb-6 text-center">

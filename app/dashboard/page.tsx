@@ -1,137 +1,146 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Pagination } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/pagination'
-import { useRouter } from 'next/navigation'
-import { ethers } from 'ethers'
+"use client";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { useRouter } from "next/navigation";
+import { ethers } from "ethers";
 
-import { Domain, ContentData } from '@/types/walletAccount';
-import NavbarMint from '@/components/NavbarMint'
-import Union from '@/assets/Union (1).svg'
-import { storage, StorageKeys } from '@/utils/storage'
-import { RootState } from '@/store/store'
-import { useContract } from '@/hooks/useContract'
-import { useSelector } from 'react-redux'
+import { Domain, ContentData } from "@/types/walletAccount";
+import NavbarMint from "@/components/NavbarMint";
+import Union from "@/assets/Union (1).svg";
+import { storage, StorageKeys } from "@/utils/storage";
+import { RootState } from "@/store/store";
+import { useContract } from "@/hooks/useContract";
+import { useSelector } from "react-redux";
 // import { useMetaMask } from '@/hooks/useMetaMask'
-import { useHtmlContract } from '@/hooks/useHtmlContract'
-import { htmlPageABI } from '@/contracts/html-page-factory/abi'
+import { useHtmlContract } from "@/hooks/useHtmlContract";
+import { htmlPageABI } from "@/contracts/html-page-factory/abi";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const DashboardPage = () => {
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState('blockspace')
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("blockspace");
   // const { connect, isConnecting } = useMetaMask()
-  const { contract, provider } = useContract()
-  const {contract: contractHtml, provider: providerHtml} = useHtmlContract()
-  const account = useSelector((state: RootState) => state.wallet.account)
-  const [blockspaceData, setBlockspaceData] = useState<Domain[]>([])
-  const [contentData, setContentData] = useState<ContentData[]>([])
+  const { contract, provider } = useContract();
+  const { contract: contractHtml, provider: providerHtml } = useHtmlContract();
+  const account = useSelector((state: RootState) => state.wallet.account);
+  const [blockspaceData, setBlockspaceData] = useState<Domain[]>([]);
+  const [contentData, setContentData] = useState<ContentData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!contract || !provider || !contractHtml || !providerHtml) return;
 
+      try {
+        setIsLoading(true);
+        const balance = await contract.balanceOf(account);
+        const tempDomains = [];
+        const tempContents = [];
 
- useEffect(() => {
+        const userPages = await contractHtml.getUserPages(account);
 
-  const fetchData = async () => {
-    if (!contract || !provider || !contractHtml || !providerHtml) return;
-    
-    try {
-      setIsLoading(true);
-      const balance = await contract.balanceOf(account);
-      const tempDomains = [];
-      const tempContents = [];
+        for (let i = 0; i < balance; i++) {
+          try {
+            const tokenId = await contract.tokenOfOwnerByIndex(account, i);
+            const ownerOf = await contract.ownerOf(tokenId);
 
-      const userPages = await contractHtml.getUserPages(account);
+            if (ownerOf !== ethers.ZeroAddress) {
+              const domain = await contract.getDomainByTokenId(tokenId);
+              const expiration_date = await contract.getNFTExpiration(tokenId);
+              const pageContract = await contractHtml.getLinkedDomain(tokenId);
 
-      for(let i = 0; i < balance; i++) {
-        try {
-          const tokenId = await contract.tokenOfOwnerByIndex(account, i);
-          const ownerOf = await contract.ownerOf(tokenId);
-          
-          if (ownerOf !== ethers.ZeroAddress) {
-            const domain = await contract.getDomainByTokenId(tokenId);
-            const expiration_date = await contract.getNFTExpiration(tokenId);
-            const pageContract = await contractHtml.getLinkedDomain(tokenId);
-            
-            if (pageContract === ethers.ZeroAddress) {
-              tempDomains.push({ 
-                tokenId: tokenId.toString(), 
-                name: domain,
-                domain: domain,
-                expiration_date: Number(expiration_date.toString())
-              });
-            } else {
-              const htmlPage = new ethers.Contract(pageContract, htmlPageABI, providerHtml);
-              const pageName = await htmlPage.name();
-              tempContents.push({
-                name: pageName,
-                pageContract: pageContract,
-                status: "linked",
-                domain: domain,
-                tokenId: tokenId.toString(), 
-              });
-              
-              tempDomains.push({
-                tokenId: tokenId.toString(),
-                name: domain,
-                domain: domain,
-                pageContract: pageContract,
-                expiration_date: Number(expiration_date.toString())
-              });
+              if (pageContract === ethers.ZeroAddress) {
+                tempDomains.push({
+                  tokenId: tokenId.toString(),
+                  name: domain,
+                  domain: domain,
+                  expiration_date: Number(expiration_date.toString()),
+                });
+              } else {
+                const htmlPage = new ethers.Contract(
+                  pageContract,
+                  htmlPageABI,
+                  providerHtml
+                );
+                const pageName = await htmlPage.name();
+                tempContents.push({
+                  name: pageName,
+                  pageContract: pageContract,
+                  status: "linked",
+                  domain: domain,
+                  tokenId: tokenId.toString(),
+                });
+
+                tempDomains.push({
+                  tokenId: tokenId.toString(),
+                  name: domain,
+                  domain: domain,
+                  pageContract: pageContract,
+                  expiration_date: Number(expiration_date.toString()),
+                });
+              }
             }
+          } catch (err) {
+            console.error("Error fetching domain:", err);
           }
-        } catch(err) {
-          console.error('Error fetching domain:', err);
         }
-      }
 
-      for(const page of userPages) {
-        const exists = tempContents.some(item => item.pageContract === page);
-        if (!exists) {
-          const htmlPage = new ethers.Contract(page, htmlPageABI, providerHtml);
-          const name = await htmlPage.name();
-          tempContents.push({
-            name: name,
-            pageContract: page,
-            status: "available",
-            domain: ""
-          });
+        for (const page of userPages) {
+          const exists = tempContents.some(
+            (item) => item.pageContract === page
+          );
+          if (!exists) {
+            const htmlPage = new ethers.Contract(
+              page,
+              htmlPageABI,
+              providerHtml
+            );
+            const name = await htmlPage.name();
+            tempContents.push({
+              name: name,
+              pageContract: page,
+              status: "available",
+              domain: "",
+            });
+          }
         }
+
+        setBlockspaceData(tempDomains);
+        setContentData(tempContents);
+        console.log("aaa", { tempContents });
+        console.log("bbb", { tempDomains });
+        // return dont have pageContract tempDomains
+        const availableBlockspaces = tempDomains.filter(
+          (item) => !item.pageContract
+        );
+        const availableContents = tempContents.filter(
+          (item) => item.status === "available"
+        );
+        console.log("ccc", { availableBlockspaces });
+        console.log("ddd", { availableContents });
+
+        storage.set(StorageKeys.AVAILABLE_DOMAİNS, availableBlockspaces);
+        storage.set(StorageKeys.AVAILABLE_CONTENTS, availableContents);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      setBlockspaceData(tempDomains);
-      setContentData(tempContents);
-      console.log("aaa",{tempContents})
-      console.log("bbb",{tempDomains})
-      // return dont have pageContract tempDomains
-      const availableBlockspaces = tempDomains.filter(item => !item.pageContract);
-      const availableContents = tempContents.filter(item => item.status === "available");
-      console.log("ccc",{availableBlockspaces})
-      console.log("ddd",{availableContents})
-      
-      storage.set(StorageKeys.AVAILABLE_DOMAİNS, availableBlockspaces);
-      storage.set(StorageKeys.AVAILABLE_CONTENTS, availableContents);
-      
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  fetchData();
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [contract, contractHtml, account]);
-
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract, contractHtml, account]);
 
   const handleManageBlockspace = (item: Domain) => {
-    storage.set(StorageKeys.SELECTED_DOMAIN, item)
-    storage.set(StorageKeys.SELECTED_FILE, null)
-    router.push(`/dashboard/manage/manage-blockspace`)
-  }
-
+    storage.set(StorageKeys.SELECTED_DOMAIN, item);
+    storage.set(StorageKeys.SELECTED_FILE, null);
+    router.push(`/dashboard/manage/manage-blockspace`);
+  };
 
   const handleManageContent = (item: ContentData) => {
     storage.set(StorageKeys.SELECTED_FILE, item);
@@ -152,6 +161,12 @@ const DashboardPage = () => {
   return (
     <div className="w-full min-h-screen bg-dark overflow-hidden">
       <NavbarMint />
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
 
       <main className="container max-w-2xl mx-auto px-4 overflow-hidden">
         <div className="pt-32">
@@ -210,7 +225,10 @@ const DashboardPage = () => {
                   <SwiperSlide>
                     <div className="space-y-4 max-w-2xl max-h-[45vh] overflow-y-auto noscrollbar">
                       {blockspaceData.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between  py-4 rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between  py-4 rounded-lg"
+                        >
                           <div className="flex items-center gap-3">
                             {/* {item.image ? (
                               <Image
@@ -223,7 +241,9 @@ const DashboardPage = () => {
                             ) : ( */}
                             <div className="w-10 h-10 bg-primary rounded-full transition-all"></div>
                             {/* )} */}
-                            <span className="text-white text-lg">{item.name}</span>
+                            <span className="text-white text-lg">
+                              {item.name}
+                            </span>
                           </div>
                           <button
                             className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
@@ -233,24 +253,26 @@ const DashboardPage = () => {
                           </button>
                         </div>
                       ))}
-
                     </div>
                     <div className="w-full items-center flex justify-center my-10">
-                        <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
-                          <span
-                            className="text-black text-3xl"
-                            onClick={() => handleAdd("blockspace")}
-                          >
-                            +
-                          </span>
-                        </button>
-                      </div>
+                      <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
+                        <span
+                          className="text-black text-3xl"
+                          onClick={() => handleAdd("blockspace")}
+                        >
+                          +
+                        </span>
+                      </button>
+                    </div>
                   </SwiperSlide>
 
                   <SwiperSlide>
                     <div className="space-y-4 max-h-[45vh] overflow-y-auto noscrollbar">
                       {contentData.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between  py-4 rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between  py-4 rounded-lg"
+                        >
                           <div className="flex items-center gap-3">
                             <Image
                               src={Union}
@@ -259,7 +281,9 @@ const DashboardPage = () => {
                               height={40}
                               className="rounded-full"
                             />
-                            <span className="text-white text-lg">{item.name}</span>
+                            <span className="text-white text-lg">
+                              {item.name}
+                            </span>
                           </div>
                           <button
                             className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
@@ -269,19 +293,17 @@ const DashboardPage = () => {
                           </button>
                         </div>
                       ))}
-
-                  
                     </div>
                     <div className="w-full items-center flex justify-center my-10">
-                        <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
-                          <span
-                            className="text-black text-3xl"
-                            onClick={() => handleAdd("content")}
-                          >
-                            +
-                          </span>
-                        </button>
-                      </div>
+                      <button className="w-12 h-12 flex items-center justify-center bg-secondary rounded-lg hover:bg-opacity-80 hover:text-secondary hover transition-colors">
+                        <span
+                          className="text-black text-3xl"
+                          onClick={() => handleAdd("content")}
+                        >
+                          +
+                        </span>
+                      </button>
+                    </div>
                   </SwiperSlide>
                 </Swiper>
               </div>

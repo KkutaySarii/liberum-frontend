@@ -11,6 +11,7 @@ import Arrow2 from "@/assets/arrow2.svg";
 import { useSocket } from "@/hooks/useSocket";
 import { SearchResults } from "@/types/walletAccount";
 import { storage, StorageKeys } from "@/utils/storage";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const MintPage = () => {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -98,6 +99,12 @@ const MintPage = () => {
   return (
     <div className="w-full h-screen bg-dark lg:overflow-hidden overflow-y-auto noscrollbar">
       <NavbarMint />
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
 
       <main className="container max-w-5xl mx-auto mt-12 overflow-hidden">
         <div className="pt-32 text-center overflow-hidden">

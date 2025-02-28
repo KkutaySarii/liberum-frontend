@@ -7,11 +7,11 @@ import { storage, StorageKeys } from "@/utils/storage";
 import { useRouter } from "next/navigation";
 import { ImageUpload } from "@/components/common/image-upload";
 import { SearchResults } from "@/types/walletAccount";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const MintSuccessPage = () => {
   const router = useRouter();
   const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN);
-  
 
   const handleGoDashboard = () => {
     storage.set(StorageKeys.SELECTED_DOMAIN, null);
@@ -27,6 +27,12 @@ const MintSuccessPage = () => {
   return (
     <div className="w-full h-screen bg-dark overflow-hidden">
       <NavbarMint />
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
 
       <main className="container max-w-5xl mx-auto mt-12">
         <div className="pt-32 text-center">
@@ -35,7 +41,10 @@ const MintSuccessPage = () => {
             You can customize your blockspace view. Set a favicon!
           </p>
           <div className="flex items-center justify-center w-full mb-5">
-            <ImageUpload domain_id={(selectedDomain as SearchResults)?._id} size={200} />
+            <ImageUpload
+              domain_id={(selectedDomain as SearchResults)?._id}
+              size={200}
+            />
           </div>
 
           <p className="text-3xl font-semibold mb-12">{selectedDomain?.name}</p>

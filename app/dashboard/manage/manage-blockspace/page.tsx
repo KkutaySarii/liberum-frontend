@@ -13,17 +13,21 @@ import { RootState } from "@/store/store";
 import { useHtmlContract } from "@/hooks/useHtmlContract";
 import { useHtmlPageContract } from "@/hooks/useHtmlPage";
 import toast from "react-hot-toast";
+import { IoMdArrowRoundBack } from "react-icons/io";
 const ManageBlockspacePage = () => {
   const router = useRouter();
 
-  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null)
-  const [linkedContent, setLinkedContent] = useState<string | null>(null)
-  const { callContractMethod } = useHtmlContract()
-  const { contract: htmlPageContract,provider: htmlPageProvider } = useHtmlPageContract(selectedDomain?.pageContract ? selectedDomain?.pageContract : "")
+  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
+  const [linkedContent, setLinkedContent] = useState<string | null>(null);
+  const { callContractMethod } = useHtmlContract();
+  const { contract: htmlPageContract, provider: htmlPageProvider } =
+    useHtmlPageContract(
+      selectedDomain?.pageContract ? selectedDomain?.pageContract : ""
+    );
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const account = useSelector((state: RootState) => state.wallet.account)
-  const owner = account
-  const expiry = selectedDomain?.expiration_date  
+  const account = useSelector((state: RootState) => state.wallet.account);
+  const owner = account;
+  const expiry = selectedDomain?.expiration_date;
 
   useEffect(() => {
     const selectedDomainStore = storage.get(
@@ -71,23 +75,20 @@ const ManageBlockspacePage = () => {
         selectedDomain?.tokenId
       );
 
-
-      if(tx){
+      if (tx) {
         toast.success("Unlinked successfully", { position: "top-right" });
       }
-      console.log("Mint transaction:", tx); 
-        const newSelectedDomain = {
-          ...selectedDomain,
-          pageContract: "",
-        } as Domain;
-        setSelectedDomain(newSelectedDomain);
-        storage.set(StorageKeys.SELECTED_DOMAIN, newSelectedDomain);
-        setLinkedContent(null);
-    
-
+      console.log("Mint transaction:", tx);
+      const newSelectedDomain = {
+        ...selectedDomain,
+        pageContract: "",
+      } as Domain;
+      setSelectedDomain(newSelectedDomain);
+      storage.set(StorageKeys.SELECTED_DOMAIN, newSelectedDomain);
+      setLinkedContent(null);
     } catch (error) {
       console.error("Error unlinking domain:", error);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -108,6 +109,12 @@ const ManageBlockspacePage = () => {
   return (
     <div className="w-full h-screen bg-dark overflow-hidden">
       <NavbarMint />
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
 
       <main className="container max-w-3xl mx-auto mt-12 pb-20">
         <div className="pt-32 text-start">
@@ -186,7 +193,6 @@ const ManageBlockspacePage = () => {
               >
                 Visit Site
               </button>
-
             )}
             {!linkedContent && (
               <Link

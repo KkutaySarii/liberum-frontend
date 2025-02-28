@@ -6,14 +6,24 @@ import Image from "next/image";
 import Union from "@/assets/Union (1).svg";
 import NavbarMint from "@/components/NavbarMint";
 import { storage, StorageKeys } from "@/utils/storage";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { useRouter } from "next/navigation";
 
 const LinkSuccessPage = () => {
   const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN);
   const selectedFile = storage.get(StorageKeys.SELECTED_FILE);
 
+  const router = useRouter();
+
   return (
     <div className="w-full min-h-screen bg-dark overflow-hidden ">
       <NavbarMint />
+      <div
+        className="fixed top-40 left-24 cursor-pointer text-white "
+        onClick={() => router.back()}
+      >
+        <IoMdArrowRoundBack className="w-8 h-8" />
+      </div>
 
       <main className="container max-w-5xl mx-auto mt-12">
         <div className="pt-32 text-center">
