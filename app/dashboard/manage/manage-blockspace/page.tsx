@@ -2,18 +2,22 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 import NavbarMint from "@/components/NavbarMint";
-import Union from "@/assets/Union (1).svg";
+// import Union from "@/assets/Union (1).svg";
 import { storage, StorageKeys } from "@/utils/storage";
-import { ImageUpload } from "@/components/common/image-upload";
+// import { ImageUpload } from "@/components/common/image-upload";
+import { Domain, ContentData } from "@/types/walletAccount";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const ManageBlockspacePage = () => {
   const router = useRouter();
-  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN);
-  const selectedFile = storage.get(StorageKeys.SELECTED_FILE);
-  const linkedContent = selectedDomain?.linkedContent;
-  const owner = selectedDomain?.owner;
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain;
+  const selectedFile = storage.get(StorageKeys.SELECTED_FILE) as ContentData;
+  const linkedContent = selectedDomain?.pageContract ? selectedDomain?.pageContract : null
+  const account = useSelector((state: RootState) => state.wallet.account)
+  const owner = account
   const expiry = "26.04.2001"; //TODOO contractten al
 
   const handleUnlink = () => {
@@ -24,7 +28,7 @@ const ManageBlockspacePage = () => {
   };
   useEffect(() => {
     if (linkedContent) {
-      storage.set(StorageKeys.SELECTED_FILE, linkedContent);
+      // storage.set(StorageKeys.SELECTED_FILE, linkedContent);
     } else {
       storage.set(StorageKeys.SELECTED_FILE, null);
     }
@@ -47,7 +51,7 @@ const ManageBlockspacePage = () => {
           <div className="flex items-center gap-3 mb-6">
             <div className="flex items-center justify-center">
               {/*TODO: domain id buraya gelmesi lazım */}
-              <ImageUpload domain_id={selectedDomain?._id} size={60} />
+              {/* <ImageUpload domain_id={selectedDomain?._id} size={60} /> */}
             </div>
             <span className="text-2xl text-white">{selectedDomain?.name}</span>
           </div>
@@ -61,26 +65,18 @@ const ManageBlockspacePage = () => {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    {linkedContent.image ? (
-                      <Image
-                        src={linkedContent.image}
-                        alt={linkedContent.name}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <Image
+    
+                      {/* <Image
                         src={Union}
                         alt={linkedContent.name}
                         width={40}
                         height={40}
                         className="rounded-full"
-                      />
-                    )}
-                    <span className="text-white text-lg">
-                      {linkedContent.name}
-                    </span>
+                      /> */}
+
+
+                    <span className="text-white text-lg">{linkedContent}</span>
+
                   </div>
                   <button
                     className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
@@ -117,13 +113,15 @@ const ManageBlockspacePage = () => {
           </div>
 
           <div className="flex justify-center gap-4">
-            {linkedContent && (
-              <Link
-                href={`/`} //TODO: Visit Site
-                className="w-1/3 px-6 py-3 mt-4 bg-secondary text-black rounded-lg hover:bg-opacity-90 transition-colors font-semibold flex items-center justify-center"
-              >
-                Visit Site
-              </Link>
+
+          {linkedContent && (
+            <Link 
+            href={`${selectedDomain?.name}`} 
+              className="w-1/3 px-6 py-3 mt-4 bg-secondary text-black rounded-lg hover:bg-opacity-90 transition-colors font-semibold flex items-center justify-center" 
+            >
+              Visit Site
+            </Link>
+
             )}
             {!linkedContent && (
               <Link

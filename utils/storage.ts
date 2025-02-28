@@ -1,4 +1,4 @@
-import { SearchResults, Content } from "@/types/walletAccount";
+import { SearchResults, Content, Domain, ContentData } from "@/types/walletAccount";
 
 export const StorageKeys = {
   SELECTED_DOMAIN: "selectedDomain",
@@ -8,9 +8,9 @@ export const StorageKeys = {
 type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];
 type StorageValue<K extends StorageKey> =
   K extends typeof StorageKeys.SELECTED_DOMAIN
-    ? SearchResults | null
+    ? SearchResults | Domain | null
     : K extends typeof StorageKeys.SELECTED_FILE
-    ? Content | null
+    ? Content | ContentData | null
     : never;
 
 export const storage = {

@@ -18,6 +18,18 @@ export interface Wallet {
   selectedContent: Content | null;
 }
 
+export interface Domain {
+  tokenId: string;
+  name: string;
+  pageContract?: string;
+}
+export interface ContentData{
+  name: string;
+  pageContract: string;
+  status: string;
+  domain: string;
+}
+
 export interface Blockspace {
   name: string;
   image: string;
@@ -29,7 +41,6 @@ export interface Blockspace {
 
 export interface Content {
   name: string;
-  image: string;
   linkedBlockspace: SearchResults | null;
   owner: string;
   contractAddress: string;

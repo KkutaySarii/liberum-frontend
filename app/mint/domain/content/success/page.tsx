@@ -41,7 +41,7 @@ const selectedFile = storage.get(StorageKeys.SELECTED_FILE)
 
           <div className="flex justify-center gap-8 max-w-xl mx-auto">
             <Link 
-              href={`/visit`}
+              href={`${selectedDomain?.name}`}
               className="w-1/2 py-3 bg-secondary text-black rounded-lg hover:bg-opacity-90 transition-colors font-semibold"
             >
               Visit Site

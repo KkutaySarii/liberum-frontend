@@ -6,10 +6,12 @@ import NavbarMint from "@/components/NavbarMint";
 import { storage, StorageKeys } from "@/utils/storage";
 import { useRouter } from "next/navigation";
 import { ImageUpload } from "@/components/common/image-upload";
+import { SearchResults } from "@/types/walletAccount";
 
 const MintSuccessPage = () => {
   const router = useRouter();
   const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN);
+  
 
   const handleGoDashboard = () => {
     storage.set(StorageKeys.SELECTED_DOMAIN, null);
@@ -33,7 +35,7 @@ const MintSuccessPage = () => {
             You can customize your blockspace view. Set a favicon!
           </p>
           <div className="flex items-center justify-center w-full mb-5">
-            <ImageUpload domain_id={selectedDomain?._id} size={200} />
+            <ImageUpload domain_id={(selectedDomain as SearchResults)?._id} size={200} />
           </div>
 
           <p className="text-3xl font-semibold mb-12">{selectedDomain?.name}</p>

@@ -13,12 +13,14 @@ import { RootState } from '@/store/store'
 import { useSelector } from 'react-redux'
 import { useHtmlContract } from '@/hooks/useHtmlContract'
 import { ethers } from 'ethers'
-
+import { Domain, ContentData } from '@/types/walletAccount'
 
 const LinkBlockspacePage = () => {
   const router = useRouter()
   //const searchParams = useSearchParams()
-  const pageAddress = "pageAddress" //TODO: get from kaydedilmiş contentlerden 
+  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain
+  const selectedFile = storage.get(StorageKeys.SELECTED_FILE) as ContentData
+  const pageAddress = selectedFile?.pageContract
   const [tokenId, setTokenId] = useState<string | null>(null)
     const { contract ,provider} = useContract()
     const { contract: htmlContract ,callContractMethod:callHtmlContractMethod,provider:htmlProvider} = useHtmlContract()
@@ -27,8 +29,7 @@ const LinkBlockspacePage = () => {
       network: '0',
       total: '0'
     })
-  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN)
-const selectedFile = storage.get(StorageKeys.SELECTED_FILE)
+
     const [openChangeModal, setOpenChangeModal] = useState(false)
     const [modalType, setModalType] = useState<'blockspace' | 'content'>('blockspace')
     

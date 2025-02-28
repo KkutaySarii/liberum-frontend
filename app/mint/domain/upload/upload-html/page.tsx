@@ -8,7 +8,6 @@ import UploadIconWhite from "@/assets/cloudwhite.svg"
 import FileIcon from "@/assets/file.svg"
 import LoadingIcon from "@/assets/loading.svg"
 import CloseIcon from "@/assets/close.svg"
-import Union from "@/assets/Union (1).svg"
 import { useHtmlContract } from '@/hooks/useHtmlContract'
 import { htmlContractABI } from '@/contracts/html-page-factory/abi'
 import { ethers, Interface } from 'ethers'
@@ -119,7 +118,6 @@ const UploadHtmlPage = () => {
       }
       storage.set(StorageKeys.SELECTED_FILE, {
         name: fileName,
-        image: Union,
         linkedBlockspace: null,
         owner: '',
         contractAddress: ''
