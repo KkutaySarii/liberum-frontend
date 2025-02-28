@@ -31,11 +31,6 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
 
-useEffect(() => {
-  console.log({blockspaceData})
-  console.log({contentData})
-
-}, [blockspaceData, contentData])
 
  useEffect(() => {
 
@@ -57,13 +52,15 @@ useEffect(() => {
           
           if (ownerOf !== ethers.ZeroAddress) {
             const domain = await contract.getDomainByTokenId(tokenId);
+            const expiration_date = await contract.getNFTExpiration(tokenId);
             const pageContract = await contractHtml.getLinkedDomain(tokenId);
             
             if (pageContract === ethers.ZeroAddress) {
               tempDomains.push({ 
                 tokenId: tokenId.toString(), 
                 name: domain,
-                domain: domain 
+                domain: domain,
+                expiration_date: Number(expiration_date.toString())
               });
             } else {
               const htmlPage = new ethers.Contract(pageContract, htmlPageABI, providerHtml);
@@ -72,14 +69,16 @@ useEffect(() => {
                 name: pageName,
                 pageContract: pageContract,
                 status: "linked",
-                domain: domain
+                domain: domain,
+                tokenId: tokenId.toString(), 
               });
               
               tempDomains.push({
                 tokenId: tokenId.toString(),
                 name: domain,
                 domain: domain,
-                pageContract: pageContract
+                pageContract: pageContract,
+                expiration_date: Number(expiration_date.toString())
               });
             }
           }
@@ -104,6 +103,16 @@ useEffect(() => {
 
       setBlockspaceData(tempDomains);
       setContentData(tempContents);
+      console.log("aaa",{tempContents})
+      console.log("bbb",{tempDomains})
+      // return dont have pageContract tempDomains
+      const availableBlockspaces = tempDomains.filter(item => !item.pageContract);
+      const availableContents = tempContents.filter(item => item.status === "available");
+      console.log("ccc",{availableBlockspaces})
+      console.log("ddd",{availableContents})
+      
+      storage.set(StorageKeys.AVAILABLE_DOMAİNS, availableBlockspaces);
+      storage.set(StorageKeys.AVAILABLE_CONTENTS, availableContents);
       
     } catch (err) {
       console.error('Error fetching data:', err);

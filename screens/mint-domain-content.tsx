@@ -14,7 +14,7 @@ import { RootState } from "@/store/store";
 
 const formatAddress = (address: string | null) => {
   if (!address) return "";
-  return `${address.slice(0, 10)}...${address.slice(-8)}`;
+  return `${address?.slice(0, 10)}...${address?.slice(-8)}`;
 };
 
 const LinkPage = () => {

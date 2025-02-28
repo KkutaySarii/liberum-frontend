@@ -22,12 +22,14 @@ export interface Domain {
   tokenId: string;
   name: string;
   pageContract?: string;
+  expiration_date: number;
 }
 export interface ContentData{
   name: string;
   pageContract: string;
   status: string;
   domain: string;
+  tokenId?: string;
 }
 
 export interface Blockspace {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 // import Image from "next/image";
@@ -7,23 +7,77 @@ import NavbarMint from "@/components/NavbarMint";
 // import Union from "@/assets/Union (1).svg";
 import { storage, StorageKeys } from "@/utils/storage";
 // import { ImageUpload } from "@/components/common/image-upload";
-import { Domain, ContentData } from "@/types/walletAccount";
+import { Domain } from "@/types/walletAccount";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { useHtmlContract } from "@/hooks/useHtmlContract";
+import { useHtmlPageContract } from "@/hooks/useHtmlPage";
 
 const ManageBlockspacePage = () => {
   const router = useRouter();
-  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain;
-  const selectedFile = storage.get(StorageKeys.SELECTED_FILE) as ContentData;
-  const linkedContent = selectedDomain?.pageContract ? selectedDomain?.pageContract : null
+  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null)
+  const [linkedContent, setLinkedContent] = useState<string | null>(null)
+  const { callContractMethod } = useHtmlContract()
+  const { contract: htmlPageContract,provider: htmlPageProvider } = useHtmlPageContract(selectedDomain?.pageContract ? selectedDomain?.pageContract : "")
+
   const account = useSelector((state: RootState) => state.wallet.account)
   const owner = account
-  const expiry = "26.04.2001"; //TODOO contractten al
+  const expiry = selectedDomain?.expiration_date  
 
-  const handleUnlink = () => {
-    if (selectedFile) {
-      //TODO: Unlink Content
-      storage.set(StorageKeys.SELECTED_FILE, null);
+  useEffect(() => {
+    const selectedDomainStore = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain;
+  setSelectedDomain(selectedDomainStore);
+  if (selectedDomainStore?.pageContract) {
+    setLinkedContent(selectedDomainStore?.pageContract)
+  }
+  }, []);
+
+  const formatExpiry = (expiry: number| undefined) => {
+    return new Date(Number(expiry?.toString()) * 1000).toLocaleDateString('tr-TR')
+  }
+  const formatAddress = (address: string) => {
+    return address?.slice(0, 10) + "..." + address?.slice(-8)
+  }
+
+  useEffect(() => {
+    if (htmlPageContract && htmlPageProvider) {
+      const getContent = async () => {
+        const content = await htmlPageContract.GET("")
+
+        console.log({content})
+      }
+      getContent()
+    }
+  }, [htmlPageContract, htmlPageProvider])
+  
+
+  console.log(linkedContent);
+
+  const handleUnlinkContent = async () => {
+    try {
+      console.log("girdi")
+      if (!selectedDomain?.pageContract ) {
+        throw new Error("Page Contract is required");
+      }
+
+      const tx = await callContractMethod(
+        "unlinkDomain",
+        selectedDomain?.pageContract,
+        selectedDomain?.tokenId,
+      );
+
+      console.log("Mint transaction:", tx); 
+        const newSelectedDomain = {
+          ...selectedDomain,
+          pageContract: "",
+        } as Domain;
+        setSelectedDomain(newSelectedDomain);
+        storage.set(StorageKeys.SELECTED_DOMAIN, newSelectedDomain);
+        setLinkedContent(null);
+    
+
+    } catch (error) {
+      console.error("Error unlinking domain:", error);
     }
   };
   useEffect(() => {
@@ -35,10 +89,10 @@ const ManageBlockspacePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!selectedDomain) {
-    router.push("/home");
-    return;
-  }
+  // if (!selectedDomain) {
+  //   router.push("/home");
+  //   return;
+  // }
 
   return (
     <div className="w-full h-screen bg-dark overflow-hidden">
@@ -80,7 +134,7 @@ const ManageBlockspacePage = () => {
                   </div>
                   <button
                     className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
-                    onClick={handleUnlink}
+                    onClick={handleUnlinkContent}
                   >
                     Unlink
                   </button>
@@ -96,12 +150,12 @@ const ManageBlockspacePage = () => {
           <div className="grid grid-cols-2 gap-8 mb-8">
             <div className="text-center">
               <h2 className="text-2xl text-white mb-4">Owner</h2>
-              <p className="text-gray-400 break-all">{owner}</p>
+              <p className="text-gray-400 break-all">{formatAddress(owner)}</p>
             </div>
             <div className="text-center flex items-end justify-center gap-2">
               <div className="flex-col items-center justify-center gap-4">
                 <h2 className="text-2xl text-white mb-4">Expiry</h2>
-                <p className="text-gray-400">{expiry}</p>
+                <p className="text-gray-400">{formatExpiry(expiry)}</p>
               </div>
               <button
                 className="px-2 py-1 font-semibold text-xs bg-secondary text-black rounded hover:bg-opacity-90 transition-colors"

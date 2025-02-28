@@ -1,28 +1,63 @@
-"use client";
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import NavbarMint from "@/components/NavbarMint";
-import Union from "@/assets/Union (1).svg";
-import { storage, StorageKeys } from "@/utils/storage";
-import { ContentData, Domain } from "@/types/walletAccount";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { formatAddress } from "@/utils/util";
+"use client"
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import NavbarMint from '@/components/NavbarMint'
+import Union from '@/assets/Union (1).svg'
+import { storage, StorageKeys } from '@/utils/storage'
+import { ContentData } from '@/types/walletAccount'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
+import { useHtmlContract } from '@/hooks/useHtmlContract'
+
 
 const ManageContentPage = () => {
-  const selectedFile = storage.get(StorageKeys.SELECTED_FILE) as ContentData;
-  const selectedDomain = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain;
-  const linkedBlockspace =
-    selectedFile?.status === "linked" ? selectedFile?.domain : null;
-  const account = useSelector((state: RootState) => state.wallet.account);
-  const owner = account;
-  const contractAddress = selectedFile?.pageContract;
 
-  const handleUnlink = () => {
-    if (selectedDomain) {
-      //TODO: Unlink Domain
-      storage.set(StorageKeys.SELECTED_DOMAIN, null);
+const [selectedFile, setSelectedFile] = useState<ContentData | null>(null)
+
+const [linkedBlockspace, setLinkedBlockspace] = useState<string | null>(null)
+  const account = useSelector((state: RootState) => state.wallet.account)
+  const { callContractMethod } = useHtmlContract()
+  const owner =  account
+  const contractAddress = selectedFile?.pageContract ? selectedFile?.pageContract : ""
+
+  const formatAddress = (address: string) => {
+    return address?.slice(0, 10) + "..." + address?.slice(-8)
+  }
+  useEffect(() => {
+    const selectedFileStore = storage.get(StorageKeys.SELECTED_FILE) as ContentData;
+    setSelectedFile(selectedFileStore)
+    if (selectedFileStore?.domain) {
+      setLinkedBlockspace(selectedFileStore?.domain)
+    }
+  }, [])
+
+
+  const handleUnlinkDomain =  async () => {
+    console.log("girdi")
+    try {
+      if (!selectedFile?.pageContract || !selectedFile?.tokenId) {
+        throw new Error("Page Contract is required");
+      }
+
+      const tx = await callContractMethod(
+        "unlinkDomain",
+        selectedFile?.pageContract,
+        selectedFile?.tokenId,
+      );
+
+      console.log("Mint transaction:", tx);
+    const newSelectedFile = {
+      ...selectedFile,
+      domain: "",
+      tokenId: "",
+    } as ContentData;
+    setSelectedFile(newSelectedFile);
+    storage.set(StorageKeys.SELECTED_FILE, newSelectedFile);
+    setLinkedBlockspace(null);
+
+    } catch (error) {
+      console.error("Error unlinking domain:", error);
     }
   };
   // useEffect(() => {
@@ -75,7 +110,7 @@ const ManageContentPage = () => {
                   </div>
                   <button
                     className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
-                    onClick={handleUnlink}
+                    onClick={handleUnlinkDomain}
                   >
                     Unlink
                   </button>

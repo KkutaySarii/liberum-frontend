@@ -3,6 +3,8 @@ import { SearchResults, Content, Domain, ContentData } from "@/types/walletAccou
 export const StorageKeys = {
   SELECTED_DOMAIN: "selectedDomain",
   SELECTED_FILE: "selectedFile",
+  AVAILABLE_DOMAİNS:"available_domains",
+  AVAILABLE_CONTENTS:"available_contents"
 } as const;
 
 type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];
@@ -11,6 +13,10 @@ type StorageValue<K extends StorageKey> =
     ? SearchResults | Domain | null
     : K extends typeof StorageKeys.SELECTED_FILE
     ? Content | ContentData | null
+    : K extends typeof StorageKeys.AVAILABLE_DOMAİNS
+    ? Domain[] | null
+    : K extends typeof StorageKeys.AVAILABLE_CONTENTS
+    ? ContentData[] | null
     : never;
 
 export const storage = {
