@@ -15,67 +15,71 @@ import { useHtmlPageContract } from "@/hooks/useHtmlPage";
 
 const ManageBlockspacePage = () => {
   const router = useRouter();
-  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null)
-  const [linkedContent, setLinkedContent] = useState<string | null>(null)
-  const { callContractMethod } = useHtmlContract()
-  const { contract: htmlPageContract,provider: htmlPageProvider } = useHtmlPageContract(selectedDomain?.pageContract ? selectedDomain?.pageContract : "")
+  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
+  const [linkedContent, setLinkedContent] = useState<string | null>(null);
+  const { callContractMethod } = useHtmlContract();
+  const { contract: htmlPageContract, provider: htmlPageProvider } =
+    useHtmlPageContract(
+      selectedDomain?.pageContract ? selectedDomain?.pageContract : ""
+    );
 
-  const account = useSelector((state: RootState) => state.wallet.account)
-  const owner = account
-  const expiry = selectedDomain?.expiration_date  
+  const account = useSelector((state: RootState) => state.wallet.account);
+  const owner = account;
+  const expiry = selectedDomain?.expiration_date;
 
   useEffect(() => {
-    const selectedDomainStore = storage.get(StorageKeys.SELECTED_DOMAIN) as Domain;
-  setSelectedDomain(selectedDomainStore);
-  if (selectedDomainStore?.pageContract) {
-    setLinkedContent(selectedDomainStore?.pageContract)
-  }
+    const selectedDomainStore = storage.get(
+      StorageKeys.SELECTED_DOMAIN
+    ) as Domain;
+    setSelectedDomain(selectedDomainStore);
+    if (selectedDomainStore?.pageContract) {
+      setLinkedContent(selectedDomainStore?.pageContract);
+    }
   }, []);
 
-  const formatExpiry = (expiry: number| undefined) => {
-    return new Date(Number(expiry?.toString()) * 1000).toLocaleDateString('tr-TR')
-  }
+  const formatExpiry = (expiry: number | undefined) => {
+    return new Date(Number(expiry?.toString()) * 1000).toLocaleDateString(
+      "tr-TR"
+    );
+  };
   const formatAddress = (address: string) => {
-    return address?.slice(0, 10) + "..." + address?.slice(-8)
-  }
+    return address?.slice(0, 10) + "..." + address?.slice(-8);
+  };
 
   useEffect(() => {
     if (htmlPageContract && htmlPageProvider) {
       const getContent = async () => {
-        const content = await htmlPageContract.GET("")
+        const content = await htmlPageContract.GET("");
 
-        console.log({content})
-      }
-      getContent()
+        console.log({ content });
+      };
+      getContent();
     }
-  }, [htmlPageContract, htmlPageProvider])
-  
+  }, [htmlPageContract, htmlPageProvider]);
 
   console.log(linkedContent);
 
   const handleUnlinkContent = async () => {
     try {
-      console.log("girdi")
-      if (!selectedDomain?.pageContract ) {
+      console.log("girdi");
+      if (!selectedDomain?.pageContract) {
         throw new Error("Page Contract is required");
       }
 
       const tx = await callContractMethod(
         "unlinkDomain",
         selectedDomain?.pageContract,
-        selectedDomain?.tokenId,
+        selectedDomain?.tokenId
       );
 
-      console.log("Mint transaction:", tx); 
-        const newSelectedDomain = {
-          ...selectedDomain,
-          pageContract: "",
-        } as Domain;
-        setSelectedDomain(newSelectedDomain);
-        storage.set(StorageKeys.SELECTED_DOMAIN, newSelectedDomain);
-        setLinkedContent(null);
-    
-
+      console.log("Mint transaction:", tx);
+      const newSelectedDomain = {
+        ...selectedDomain,
+        pageContract: "",
+      } as Domain;
+      setSelectedDomain(newSelectedDomain);
+      storage.set(StorageKeys.SELECTED_DOMAIN, newSelectedDomain);
+      setLinkedContent(null);
     } catch (error) {
       console.error("Error unlinking domain:", error);
     }
@@ -119,8 +123,7 @@ const ManageBlockspacePage = () => {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-    
-                      {/* <Image
+                    {/* <Image
                         src={Union}
                         alt={linkedContent.name}
                         width={40}
@@ -128,9 +131,7 @@ const ManageBlockspacePage = () => {
                         className="rounded-full"
                       /> */}
 
-
                     <span className="text-white text-lg">{linkedContent}</span>
-
                   </div>
                   <button
                     className="px-4 py-1.5 bg-white text-black rounded-md hover:bg-opacity-90 transition-colors"
@@ -167,15 +168,16 @@ const ManageBlockspacePage = () => {
           </div>
 
           <div className="flex justify-center gap-4">
-
-          {linkedContent && (
-            <Link 
-            href={`${selectedDomain?.name}`} 
-              className="w-1/3 px-6 py-3 mt-4 bg-secondary text-black rounded-lg hover:bg-opacity-90 transition-colors font-semibold flex items-center justify-center" 
-            >
-              Visit Site
-            </Link>
-
+            {linkedContent && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open(`http://${selectedDomain?.name}`, "_blank");
+                }}
+                className="w-1/3 px-6 py-3 mt-4 bg-secondary text-black rounded-lg hover:bg-opacity-90 transition-colors font-semibold flex items-center justify-center"
+              >
+                Visit Site
+              </button>
             )}
             {!linkedContent && (
               <Link

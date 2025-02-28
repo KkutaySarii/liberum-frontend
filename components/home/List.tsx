@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FC, useState } from "react";
+
 import Image from "next/image";
 
 import { DomianList, DomianListItem } from "@/types/home";
@@ -6,7 +8,6 @@ import { motion } from "framer-motion";
 
 import Info from "@/assets/info.svg";
 import Eye from "@/assets/eye.svg";
-import Link from "next/link";
 
 interface ListProps {
   title: string;
@@ -118,12 +119,15 @@ const ListItem = ({
           <Image src={Eye} alt="Eye" width={18} height={18} />
           <p className="text-white text-opacity-60 text-lg">{visits}</p>
         </div>
-        <Link
-          href={domain}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(`http://${domain}`, "_blank");
+          }}
           className="bg-primary hover:bg-primary/90 text-black text-sm px-4 py-1 rounded"
         >
           Visit
-        </Link>
+        </button>
       </div>
     </motion.div>
   );
