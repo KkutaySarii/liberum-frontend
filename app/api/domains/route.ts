@@ -4,7 +4,7 @@ import { createErrorResponse } from "@/utils/api";
 
 export async function GET() {
   try {
-    const res = await fetch(`${API_URL}/`, {
+    const res = await fetch(`${API_URL}/?limit=200`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
