@@ -37,7 +37,7 @@ const MintDomainPage = () => {
     total: "0",
   });
 
-  const {  isConnecting } = useMetaMask();
+  const { connect, isConnecting } = useMetaMask();
   const { contract, callContractMethod, provider } = useContract();
   const account = useSelector((state: RootState) => state.wallet.account);
 
@@ -48,7 +48,6 @@ const MintDomainPage = () => {
   const handleDecrement = () => {
     if (years > 1) setYears((prev) => prev - 1);
   };
-  
 
   useEffect(() => {
     const fetchTokenId = async () => {
@@ -60,7 +59,7 @@ const MintDomainPage = () => {
         console.log("girdi");
         const tokenId = await contract.getTokenIdByDomain(selectedDomain?.name);
         setTokenId(tokenId);
-        console.log("tokenId",tokenId)
+        console.log("tokenId", tokenId);
       } catch (err) {
         console.error("Error fetching prices:", err);
       }
@@ -73,24 +72,24 @@ const MintDomainPage = () => {
     const fetchPrices = async () => {
       console.log({ contract });
       console.log({ provider });
-      if (!contract || !provider || !tokenId) return;
+      if (!contract || !provider) return;
 
       try {
-
         const yearsInSeconds = yearsToSeconds(years);
         let estimateGas;
-        if (type === "extend") {
+        if (!!type && type === "extend" && tokenId) {
           estimateGas = await contract.renew.estimateGas(
             tokenId,
             yearsInSeconds
           );
-        }
-        else {
+        } else {
+          console.log("selectedDomain?.name", selectedDomain?.name);
           estimateGas = await contract.mintDomain.estimateGas(
             selectedDomain?.name,
             yearsInSeconds
           );
         }
+        console.log("estimateGas", estimateGas);
         const networkFee = await provider.getFeeData();
         if (!networkFee?.gasPrice) return;
 
@@ -117,8 +116,11 @@ const MintDomainPage = () => {
     return years * 365 * 24 * 60 * 60;
   };
 
-
   const handleMint = async () => {
+    if (!account) {
+      await connect();
+      return;
+    }
     if (type === "extend") {
       await handleExtend();
     } else {
@@ -127,7 +129,7 @@ const MintDomainPage = () => {
   };
 
   const handleFirstMint = async () => {
-    console.log("first mint")
+    console.log("first mint");
     setIsLoading(true);
     try {
       if (!selectedDomain?.name) {
@@ -145,7 +147,7 @@ const MintDomainPage = () => {
 
       console.log("Mint transaction:", tx);
 
-      if(tx){
+      if (tx) {
         toast.success("Domain minted successfully", { position: "top-right" });
       }
 
@@ -211,7 +213,7 @@ const MintDomainPage = () => {
   };
 
   const handleExtend = async () => {
-    console.log("extend")
+    console.log("extend");
     try {
       if (!tokenId) {
         throw new Error("Token ID is required");
@@ -221,8 +223,10 @@ const MintDomainPage = () => {
 
       const tx = await callContractMethod("renew", tokenId, yearsInSeconds);
 
-      if(tx){
-        toast.success("Domain extended successfully", { position: "top-right" });
+      if (tx) {
+        toast.success("Domain extended successfully", {
+          position: "top-right",
+        });
       }
 
       console.log("Mint transaction:", tx);
@@ -242,7 +246,7 @@ const MintDomainPage = () => {
 
           <div className="flex items-center justify-between mb-12">
             <div className="flex items-center justify-center gap-4">
-              <div className="w-11 h-11 bg-primary rounded-full"></div>
+              <div className="w-10 h-10 bg-primary rounded-full"></div>
               <span className="text-2xl">{selectedDomain?.name}</span>
             </div>
           </div>
@@ -294,7 +298,9 @@ const MintDomainPage = () => {
                   ? "Connecting..."
                   : account
                   ? !isLoading
-                    ? type==="extend"?"Extend":"Mint"
+                    ? type === "extend"
+                      ? "Extend"
+                      : "Mint"
                     : "Minting..."
                   : "Connect Wallet"}
               </button>
